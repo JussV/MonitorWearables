@@ -1,0 +1,109 @@
+<resources>
+    <string name="app_name">Monitor Wearables</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="bluetooth_is_not_supported_">Bluetooth is not supported.</string>
+    <string name="bluetooth_is_disabled_">Bluetooth is disabled.</string>
+
+
+    <string name="not_connected">not connected</string>
+    <string name="connecting">connecting</string>
+    <string name="connected">connected</string>
+    <string name="unknown_state">unknown state</string>
+    <string name="initializing">initializing</string>
+    <string name="initialized">initialized</string>
+    <string name="authenticating">authenticating</string>
+    <string name="authentication_required">authentication required</string>
+    <string name="waiting_for_reconnect">waiting for reconnect</string>
+    <string name="_unknown_">(unknown)</string>
+
+    <string name="controlcenter_navigation_drawer_open">Open navigation drawer</string>
+    <string name="controlcenter_navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_debug">Debug</string>
+    <string name="control_center_find_lost_device">Find lost Device</string>
+
+    <string name="controlcenter_delete_device">Delete Device</string>
+    <string name="candidate_item_device_image">Device Image</string>
+    <string name="controlcenter_fetch_activity_data">Synchronize</string>
+
+    <string name="controlcenter_snackbar_need_longpress">Long press the card to disconnect</string>
+    <string name="controlcenter_snackbar_disconnecting">Disconnecting</string>
+    <string name="controlcenter_snackbar_connecting">Connecting</string>
+    <string name="controlcenter_find_device">Find lost Device…</string>
+    <string name="controlcenter_start_activitymonitor">Your Activity (ALPHA)</string>
+
+    <string name="title_activity_appmanager">App Manager</string>
+    <string name="controlcenter_take_screenshot">Take Screenshot</string>
+    <string name="discovery_trying_to_connect_to">Trying to connect to: %1$s</string>
+
+    <string name="discovery_pair_title">Pair with %1$s?</string>
+    <string name="discovery_pair_question">Select Pair to pair your devices. If this fails, try again without pairing.</string>
+    <string name="discovery_yes_pair">Pair</string>
+    <string name="discovery_dont_pair">Don\'t Pair</string>
+    <string name="discovery_attempting_to_pair">Attempting to pair with %1$s</string>
+    <string name="discovery_bonding_failed_immediately">Bonding with %1$s failed immediately.</string>
+    <string name="discovery_successfully_bonded">Successfully bonded with %1$s.</string>
+    <string name="discovery_enable_bluetooth">Enable Bluetooth to discover devices.</string>
+    <string name="discovery_stop_scanning">Stop Scanning</string>
+    <string name="discovery_start_scanning">Start Discovery</string>
+
+    <string name="device_with_rssi">%1$s (%2$s)</string>
+    <string name="discovery_connected_devices_hint">Make your device discoverable. Currently connected devices will likely not be discovered. Activate location (e.g. GPS) on Android 6+. If no device is found after a few minutes, try again after rebooting your mobile device.</string>
+    <string name="discovery_note">Note:</string>
+
+    <string name="test_notification">Test Notification</string>
+    <string name="this_is_a_test_notification_from_gadgetbridge">This is a Test Notification from Gadgetbridge</string>
+    <string name="pairing">Pairing with %s…</string>
+    <string name="message_cannot_pair_no_mac">No mac address passed, cannot pair.</string>
+    <string name="pairing_creating_bond_with">"Creating bond with %1$s (%2$s)"</string>
+    <string name="pairing_unable_to_pair_with">"Unable to pair with %1$s (%2$s)"</string>
+    <string name="pairing_in_progress">Bonding in progress: %1$s (%2$s)</string>
+    <string name="pairing_already_bonded">"Already bonded with %1$s (%2$s), connecting…"</string>
+    <string name="miband_pairing_tap_hint">When your Mi Band vibrates and blinks, tap it a few times in a row.</string>
+    <string name="cannot_connect">Cannot connect: %1$s</string>
+    <string name="wearablehrmonitor_running">Monitor Wearables running</string>
+    <string name="cannot_connect_bt_address_invalid_">Cannot connect. BT address invalid?</string>
+    <string name="title_activity_debug">Debug</string>
+    <string name="title_activity_controlcenter">MonitorWearables</string>
+
+    <string name="title_activity_discovery">Device Discovery</string>
+    <string name="title_activity_mi_band_pairing">Pair your Mi Band</string>
+    <string name="no_items_bg">No available devices.</string>
+    <string name="delete_device">Delete %1$s</string>
+    <string name="delete_device_message">All data related to the device will be deleted.</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="collection_demo_activity">Collection Demo Activity</string>
+    <string name="measure_hr">Measure HR</string>
+    <string name="daily_hr">Daily HR</string>
+    <string name="miband_prefs_hr_sleep_detection">HR sleep detection</string>
+    <string name="hr_monitor">Heart Rate Monitor</string>
+    <string name="hr_continuous_measurement">Continuous measurement</string>
+    <string name="hr_monitor_interval">Monitor Interval</string>
+    <string name="hr_define_monitor_interval">Set time interval in seconds</string>
+    <string name="spinner_monitor_interval_title">Set Monitor Interval</string>
+    <string name="measure_now">Measure Now</string>
+    <string name="sync_heart_rate">Sync heart rate</string>
+
+    <string-array name="hr_interval_array">
+        <item> </item>
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+        <item>120</item>
+        <item>300</item>
+        <item>600</item>
+        <item>900</item>
+        <item>1200</item>
+        <item>1800</item>
+        <item>2700</item>
+        <item>3600</item>
+    </string-array>
+</resources>
