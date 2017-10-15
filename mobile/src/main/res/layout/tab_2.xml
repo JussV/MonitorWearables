@@ -1,0 +1,40 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_live_hr">
+
+    <TextView
+        android:id="@+id/tv_live_hr"
+        android:layout_width="230dp"
+        android:layout_height="180dp"
+        android:background="@drawable/cardiogram"
+        android:alpha="0.7"
+        android:layout_centerHorizontal="true"
+        android:textSize="60sp"
+        android:textAlignment="textEnd"
+        android:paddingLeft="68dp"
+        android:paddingTop="30dp"
+        android:textColor="@color/bg_live_hr"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp" />
+
+    <pl.droidsonroids.gif.GifTextView
+        android:id="@+id/gif_hr"
+        android:layout_width="150dp"
+        android:layout_height="160dp"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:layout_margin="20dp"
+        android:background="@drawable/heart_rate_live" />
+
+    <Button
+        android:id="@+id/btn_measure_hr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_live_hr"
+        android:layout_centerHorizontal="true"
+        android:text="@string/measure_now" />
+
+</RelativeLayout>

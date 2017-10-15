@@ -1,0 +1,89 @@
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/img_heart_rate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:contentDescription="@string/hr_monitor"
+            android:src="@drawable/ic_heart_pulse_grey600_24dp"/>
+
+        <Switch
+            android:id="@+id/switch_heartrate_monitor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/img_heart_rate"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:textSize="@dimen/primary_text"
+            android:text="@string/hr_monitor" />
+
+        <TextView
+            android:id="@+id/tv_heart_rate_monitor_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/switch_heartrate_monitor"
+            android:layout_below="@id/switch_heartrate_monitor"
+            android:textSize="@dimen/secondary_text"
+            android:textColor="@color/secondarytext"
+            android:layout_marginBottom="15dp"
+            android:text="@string/hr_continuous_measurement"/>
+
+        <View
+            android:id="@+id/divider_1"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/tv_heart_rate_monitor_txt"
+            android:background="@color/divider"/>
+
+        <ImageView
+            android:id="@+id/img_monitor_interval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/divider_1"
+            android:layout_margin="15dp"
+            android:contentDescription="@string/hr_continuous_measurement"
+            android:src="@drawable/ic_restore_grey600_24dp"/>
+
+        <TextView
+            android:id="@+id/tv_monitor_interval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/img_monitor_interval"
+            android:layout_alignTop="@id/img_monitor_interval"
+            android:textSize="@dimen/primary_text"
+            android:textColor="@color/primarytext_light"
+            android:text="@string/hr_monitor_interval"/>
+
+        <Spinner
+            android:id="@+id/spinner_monitor_interval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/tv_monitor_interval"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="15dp"
+            android:dropDownWidth="100dp"
+            android:entries="@array/hr_interval_array"
+            android:prompt="@string/spinner_monitor_interval_title" />
+
+        <TextView
+            android:id="@+id/tv_secondary_monitor_interval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/tv_monitor_interval"
+            android:layout_below="@id/tv_monitor_interval"
+            android:textSize="@dimen/secondary_text"
+            android:layout_marginBottom="15dp"
+            android:text="@string/hr_define_monitor_interval"/>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/tv_secondary_monitor_interval"
+            android:background="@color/divider"/>
+    </RelativeLayout>

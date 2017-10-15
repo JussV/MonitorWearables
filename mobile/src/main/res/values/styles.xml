@@ -1,0 +1,18 @@
+<resources>
+
+    <style name="GadgetbridgeTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+
+    </style>
+
+    <style name="GadgetbridgeTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="GadgetbridgeTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="GadgetbridgeTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>

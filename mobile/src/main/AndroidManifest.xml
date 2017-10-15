@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="smartlife.monitorwearables">
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+
+    <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="false" />
+
+    <application
+        android:name=".GBApplication"
+        android:allowBackup="true"
+        android:fullBackupContent="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/GadgetbridgeTheme">
+        <activity
+            android:name=".activities.ControlCenterv2"
+            android:label="@string/title_activity_controlcenter"
+            android:theme="@style/GadgetbridgeTheme.NoActionBar">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service android:name=".service.DeviceCommunicationService" />
+        <service android:name=".service.HeartRateService" />
+        <service
+            android:exported="false"
+            android:name=".service.jobs.DeleteDBJobService">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
+        <service android:name=".devices.wear.DataLayerListenerService" >
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+            </intent-filter>
+        </service>
+        <activity
+            android:name=".activities.DebugActivity"
+            android:label="@string/title_activity_debug"
+            android:parentActivityName=".activities.ControlCenterv2"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activities.DiscoveryActivity"
+            android:label="@string/title_activity_discovery"
+            android:parentActivityName=".activities.ControlCenterv2" />
+        <activity
+            android:name=".devices.miband.MiBandPairingActivity"
+            android:label="@string/title_activity_mi_band_pairing" />
+        <activity
+            android:name=".activities.CollectionDemoActivity"
+            android:label="@string/collection_demo_activity"
+            android:parentActivityName=".activities.ControlCenterv2"
+            android:theme="@style/GadgetbridgeTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="smartlife.monitorwearables.displayhr" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.GBActivity"
+            android:theme="@style/GadgetbridgeTheme.NoActionBar" />
+
+    </application>
+
+</manifest>
