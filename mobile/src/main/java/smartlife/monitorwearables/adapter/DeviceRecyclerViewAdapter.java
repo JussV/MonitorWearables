@@ -34,6 +34,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.felkertech.settingsmanager.SettingsManager;
+
 import java.util.List;
 
 import smartlife.monitorwearables.GBApplication;
@@ -58,9 +60,10 @@ public class DeviceRecyclerViewAdapter  extends RecyclerView.Adapter<DeviceRecyc
     private final Context context;
     private List<GBDevice> deviceList;
     private ViewGroup parent;
-    private static Prefs prefs;
-    private static SharedPreferences sharedPrefs;
+  //  private static Prefs prefs;
+  //  private static SharedPreferences sharedPrefs;
     private ContinuousMeasureScheduler scheduler;
+    private SettingsManager mSettingsManager;
 
     public DeviceRecyclerViewAdapter(Context context, List<GBDevice> deviceList) {
         this.context = context;
@@ -81,9 +84,10 @@ public class DeviceRecyclerViewAdapter  extends RecyclerView.Adapter<DeviceRecyc
         final GBDevice device = deviceList.get(position);
 
         //auto connect to last connected device
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        prefs = new Prefs(sharedPrefs);
-        if(!device.isConnected() && device.getAddress().equals(prefs.getString(DeviceCommunicationService.LAST_DEVICE_ADDRESS, ""))){
+       /* sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs = new Prefs(sharedPrefs);*/
+        mSettingsManager = new SettingsManager(context);
+        if(!device.isConnected() && device.getAddress().equals(mSettingsManager.getString(DeviceCommunicationService.LAST_DEVICE_ADDRESS, ""))){
             GBApplication.deviceService().connect(device);
         }
 
@@ -114,10 +118,10 @@ public class DeviceRecyclerViewAdapter  extends RecyclerView.Adapter<DeviceRecyc
         if (device.getType().getKey() == DeviceType.MIBAND2.getKey()) {
             if (device.isInitialized()) {
                 holder.deviceImageView.setImageResource(R.drawable.miband);
-                int monitorIntervalPos = prefs.getInt(TabFragment3.MONITOR_INTERVAL_KEY, 0);
+                int monitorIntervalPos = mSettingsManager.getInt(R.string.key_monitor_interval);
                 String monitorIntervalStr = context.getResources().getStringArray(R.array.hr_interval_array)[monitorIntervalPos];
                 int monitorInterval = !monitorIntervalStr.equals("") ? Integer.valueOf(monitorIntervalStr) : 0;
-                if(prefs.getBoolean(TabFragment3.ENABLE_CONTINUOUS_MONITORING_KEY, false) &&  monitorInterval> 0){
+                if(mSettingsManager.getBoolean(R.string.key_enable_continuous_monitoring, false) &&  monitorInterval> 0){
                   //  context.startService(new Intent(context, ContinuousMeasureService.class));
                     scheduler.init(monitorInterval);
                 }

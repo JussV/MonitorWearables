@@ -33,8 +33,6 @@ import com.firebase.jobdispatcher.Trigger;
 
 import java.util.Calendar;
 import java.util.HashSet;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 

@@ -1,6 +1,7 @@
 package smartlife.monitorwearables;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -8,6 +9,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -26,10 +28,11 @@ public class HeartbeatService extends Service implements SensorEventListener {
 
     private SensorManager mSensorManager;
     private int currentValue=0;
-    private static final String LOG_TAG = "MyHeart";
+    private static final String TAG_HEART_BEAT = "HeartbeatService";
     private IBinder binder = new HeartbeatServiceBinder();
     private OnChangeListener onChangeListener;
     private GoogleApiClient mGoogleApiClient;
+    private PowerManager.WakeLock wakeLock;
 
     // interface to pass a heartbeat value to the implementing class
     public interface OnChangeListener {
@@ -63,17 +66,22 @@ public class HeartbeatService extends Service implements SensorEventListener {
         Sensor mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         // delay SENSOR_DELAY_UI is sufficient
         boolean res = mSensorManager.registerListener(this, mHeartRateSensor,  SensorManager.SENSOR_DELAY_UI);
-        Log.d(LOG_TAG, " sensor registered: " + (res ? "yes" : "no"));
+        Log.d(TAG_HEART_BEAT, " sensor registered: " + (res ? "yes" : "no"));
 
         mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
         mGoogleApiClient.connect();
     }
 
     @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         mSensorManager.unregisterListener(this);
-        Log.d(LOG_TAG," sensor unregistered");
+        Log.d(TAG_HEART_BEAT," sensor unregistered");
     }
 
     @Override
@@ -82,14 +90,14 @@ public class HeartbeatService extends Service implements SensorEventListener {
         if(sensorEvent.sensor.getType()== Sensor.TYPE_HEART_RATE && sensorEvent.values.length>0 ) {
             int newValue = Math.round(sensorEvent.values[0]);
 //            int newValue = 60;
-            //Log.d(LOG_TAG,sensorEvent.sensor.getName() + " changed to: " + newValue);
+            //Log.d(TAG_HEART_BEAT,sensorEvent.sensor.getName() + " changed to: " + newValue);
             // only do something if the value differs from the value before and the value is not 0.
             if(currentValue != newValue && newValue!=0) {
                 // save the new value
                 currentValue = newValue;
                 // send the value to the listener
                 if(onChangeListener!=null) {
-                    Log.d(LOG_TAG,"sending new value to listener: " + newValue);
+                    Log.d(TAG_HEART_BEAT,"sending new value to listener: " + newValue);
                     onChangeListener.onValueChanged(newValue);
                     sendMessageToHandheld(Integer.toString(newValue));
                 }
@@ -114,7 +122,7 @@ public class HeartbeatService extends Service implements SensorEventListener {
         if (mGoogleApiClient == null)
             return;
 
-        Log.d(LOG_TAG,"sending a message to handheld: "+message);
+        Log.d(TAG_HEART_BEAT,"sending a message to handheld: "+message);
 
         // use the api client to send the heartbeat value to our handheld
         final PendingResult<NodeApi.GetConnectedNodesResult> nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient);

@@ -2,8 +2,14 @@ package smartlife.monitorwearables.fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,19 +19,25 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import java.util.concurrent.ScheduledExecutorService;
+
+import com.felkertech.settingsmanager.SettingsManager;
+import com.felkertech.wearsettingsmanager.WearSettingsManager;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.Wearable;
 
 import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.service.ContinuousMeasureScheduler;
 
+
 /**
  * Created by Joana on 8/15/2017.
  */
-
 public class TabFragment3 extends Fragment {
-
+/*
     public static final String ENABLE_CONTINUOUS_MONITORING_KEY = "enableContinuousMonitoring";
-    public static final String MONITOR_INTERVAL_KEY = "monitorInterval";
+    public static final String MONITOR_INTERVAL_KEY = "monitorInterval";*/
 
     private Spinner intervalSpinner;
     private TextView tvMonitorInterval;
@@ -35,6 +47,9 @@ public class TabFragment3 extends Fragment {
     private int spinnerFirstPosition = 0;
     private boolean isSpinnerInitial = true;
     private ContinuousMeasureScheduler scheduler;
+    private SettingsManager mSettingsManager;
+    private WearSettingsManager mWearSettingsManager;
+    private GoogleApiClient mGoogleApiClient ;
 
     public TabFragment3(){
         scheduler = ContinuousMeasureScheduler.getInstance();
@@ -45,6 +60,7 @@ public class TabFragment3 extends Fragment {
         return myFragment;
     }
 
+
     @Override
     public View onCreateView(final LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -52,10 +68,16 @@ public class TabFragment3 extends Fragment {
         View rootView = inflater.inflate(R.layout.tab_3, container, false);
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-
+        mSettingsManager = new SettingsManager(getContext());
+        mWearSettingsManager = new WearSettingsManager(getContext());
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addApi(Wearable.API)
+                .build();
+        mGoogleApiClient.connect();
+        mWearSettingsManager.setSyncableSettingsManager(mGoogleApiClient);
+        mWearSettingsManager.writeSnapshot();
         intervalSpinner = (Spinner) rootView.findViewById(R.id.spinner_monitor_interval);
-
-        int monitorIntervalPosition = sharedPrefs.getInt(MONITOR_INTERVAL_KEY, spinnerFirstPosition);
+        int monitorIntervalPosition = sharedPrefs.getInt(getString(R.string.key_monitor_interval), spinnerFirstPosition);
         intervalSpinner.setSelection(monitorIntervalPosition);
         if(monitorIntervalPosition != spinnerFirstPosition) {
             toggleView(intervalSpinner, true, 1);
@@ -65,7 +87,7 @@ public class TabFragment3 extends Fragment {
             intervalSpinner.setSelected(false);
         }
         hrMonitorSwitch = (Switch) rootView.findViewById(R.id.switch_heartrate_monitor);
-        boolean isHRMonitorEnabled = sharedPrefs.getBoolean(ENABLE_CONTINUOUS_MONITORING_KEY, false);
+        boolean isHRMonitorEnabled = sharedPrefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false);
         if(isHRMonitorEnabled) {
             isSpinnerInitial = true;
         }
@@ -84,17 +106,23 @@ public class TabFragment3 extends Fragment {
             toggleView(intervalSpinner, false, 0.5f);
         }
 
+
         hrMonitorSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
-                    sharedPrefs.edit().putBoolean(ENABLE_CONTINUOUS_MONITORING_KEY, true).apply();
+                   // sharedPrefs.edit().putBoolean(ENABLE_CONTINUOUS_MONITORING_KEY, true).apply();
+                    mSettingsManager.setBoolean(getString(R.string.key_enable_continuous_monitoring), true);
+                    mWearSettingsManager.pushData();
                     toggleView(intervalSpinner, true, 1);
                     toggleView(tvMonitorInterval, true, 1);
                     toggleView(tvSetInterval, true, 1);
                 } else {
-                    sharedPrefs.edit().putBoolean(ENABLE_CONTINUOUS_MONITORING_KEY, false).apply();
-                    sharedPrefs.edit().putInt(MONITOR_INTERVAL_KEY, spinnerFirstPosition).apply();
+                    //sharedPrefs.edit().putBoolean(ENABLE_CONTINUOUS_MONITORING_KEY, false).apply();
+                   // sharedPrefs.edit().putInt(MONITOR_INTERVAL_KEY, spinnerFirstPosition).apply();
+                    mSettingsManager.setBoolean(getString(R.string.key_enable_continuous_monitoring), false);
+                    mSettingsManager.setInt(getString(R.string.key_monitor_interval), spinnerFirstPosition);
+                    mWearSettingsManager.pushData();
                     toggleView(intervalSpinner, false, 0.5f);
                     toggleView(tvMonitorInterval, false, 0.3f);
                     toggleView(tvSetInterval, false, 0.7f);
@@ -113,7 +141,9 @@ public class TabFragment3 extends Fragment {
                         isSpinnerInitial = false;
                     } else {
                         int interval = !intervalSpinner.getSelectedItem().toString().equals("") ? Integer.valueOf(intervalSpinner.getSelectedItem().toString()) : 0;
-                        sharedPrefs.edit().putInt(MONITOR_INTERVAL_KEY, intervalSpinner.getSelectedItemPosition()).apply();
+                        //sharedPrefs.edit().putInt(MONITOR_INTERVAL_KEY, intervalSpinner.getSelectedItemPosition()).apply();
+                        mSettingsManager.setInt(getString(R.string.key_monitor_interval), intervalSpinner.getSelectedItemPosition());
+                        mWearSettingsManager.pushData();
                         synchronized (this) {
                             scheduler.end();
                             scheduler.init(interval);
@@ -135,4 +165,6 @@ public class TabFragment3 extends Fragment {
         view.setEnabled(enabled);
         view.setAlpha(opacity);
     }
+
+
 }

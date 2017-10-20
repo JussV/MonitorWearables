@@ -3,32 +3,31 @@ package smartlife.monitorwearables;
 import android.Manifest;
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Vibrator;
+import android.os.PowerManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.wearable.activity.WearableActivity;
-import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
-import android.widget.ProgressBar;
+import android.view.View;
+import android.view.WindowInsets;
 import android.widget.TextView;
+
 
 public class WearActivity extends WearableActivity implements HeartbeatService.OnChangeListener {
 
 
     private static final String LOG_TAG = "MyHeart";
+    private static final String TAG_WEAR_ACTIVITY = "WearActivity";
 
     private TextView mTextView;
-    private TextView alertText;
     public static ServiceConnection sc;
-    //private ProgressBar pb;
-
-
+    private int mChinSize;
+    private View mainView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,35 +35,34 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
         setContentView(R.layout.wear_activity_main);
 
         ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BODY_SENSORS}, 1);
-        final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
 
-        // inflate layout depending on watch type (round or square)
-        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
+        mainView = findViewById(R.id.box_inset);
+        mainView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
             @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                // as soon as layout is there...
-                mTextView = (TextView) stub.findViewById(R.id.heartbeat);
-                alertText = (TextView) stub.findViewById(R.id.alertText);
-                // bind to our service.
-//                ComponentName heartService = startService(new Intent(WearActivity.this, HeartbeatService.class));
-                sc = new ServiceConnection() {
-                    @Override
-                    public void onServiceConnected(ComponentName componentName, IBinder binder) {
-                        Log.d(LOG_TAG, "connected to service.");
-                        // set our change listener to get change events
-                        ((HeartbeatService.HeartbeatServiceBinder)binder).setChangeListener(WearActivity.this);
-                    }
-
-                    @Override
-                    public void onServiceDisconnected(ComponentName componentName) {
-
-                    }
-                };
-                Intent intent = new Intent(WearActivity.this, HeartbeatService.class);
-//                startService(intent);
-                bindService(intent, sc, Service.BIND_AUTO_CREATE);
+            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                mChinSize = insets.getSystemWindowInsetBottom();
+                v.onApplyWindowInsets(insets);
+                return insets;
             }
         });
+
+        mTextView = findViewById(R.id.heartbeat);
+
+        sc = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder binder) {
+                Log.d(LOG_TAG, "connected to service.");
+                // set our change listener to get change events
+                ((HeartbeatService.HeartbeatServiceBinder)binder).setChangeListener(WearActivity.this);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+
+            }
+        };
+        Intent intent = new Intent(WearActivity.this, HeartbeatService.class);
+        bindService(intent, sc, Service.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -72,38 +70,23 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
         super.onResume();
     }
 
-
     @Override
     public void onValueChanged(int newValue) {
         // will be called by the service whenever the heartbeat value changes.
         mTextView.setText(Integer.toString(newValue));
-        if (newValue > 90) {
+      /*  if (newValue > 90) {
             vibrateOn();
             alertText.setText("Chill out");
-            startAn();
-        }else if(newValue>80){
+        }else if(newValue > 80){
             alertText.setText("Take it easy");
-        }else if(newValue>70){
+        }else if(newValue > 70){
             alertText.setText("Take a breath");
-        }
+        }*/
     }
 
-    public void vibrateOn(){
-        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        long[] vibrationPattern = {0, 500, 50, 300};
-        //-1 - don't repeat
-        final int indexInPatternToRepeat = -1;
-
-    }
-
-    public void startAn(){
-        ProgressBar pb = (ProgressBar) this.findViewById(R.id.progressBarToday);
-        Animation an = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF,0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        an.setFillAfter(true);
-        //if(pb.getAnimation() != null && pb.getAnimation().hasEnded()){
-        an.setDuration(10000);
-        pb.startAnimation(an);
-
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -115,16 +98,10 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
     @Override
     public void onEnterAmbient(Bundle ambientDetails) {
         super.onEnterAmbient(ambientDetails);
-        mTextView.setBackgroundColor(Color.BLACK);
-        mTextView.getPaint().setAntiAlias(false);
-        mTextView.setTextColor(Color.WHITE);
     }
 
     @Override
     public void onExitAmbient(){
-        //mTextView.setBackgroundColor(Color.CYAN);
-        mTextView.getPaint().setAntiAlias(true);
-        //mTextView.setTextColor(Color.BLACK);
         super.onExitAmbient();
     }
 
