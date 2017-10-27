@@ -19,6 +19,7 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,9 +46,7 @@ public class HeartbeatService extends Service implements SensorEventListener {
     public class HeartbeatServiceBinder extends Binder {
         public void setChangeListener(OnChangeListener listener) {
             onChangeListener = listener;
-            // return currently known value
             listener.onValueChanged(currentValue);
-//            listener.onValueChanged(60);
         }
 
     }
@@ -61,7 +60,6 @@ public class HeartbeatService extends Service implements SensorEventListener {
     @Override
     public void onCreate() {
         super.onCreate();
-        // register us as a sensor listener
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         Sensor mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         // delay SENSOR_DELAY_UI is sufficient
@@ -97,7 +95,7 @@ public class HeartbeatService extends Service implements SensorEventListener {
                 currentValue = newValue;
                 // send the value to the listener
                 if(onChangeListener!=null) {
-                    Log.d(TAG_HEART_BEAT,"sending new value to listener: " + newValue);
+                    Log.d(TAG_HEART_BEAT,new Date().toString() + ": Sending new value to listener: " + newValue);
                     onChangeListener.onValueChanged(newValue);
                     sendMessageToHandheld(Integer.toString(newValue));
                 }

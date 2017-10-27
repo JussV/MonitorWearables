@@ -40,21 +40,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service android:name=".service.DeviceCommunicationService" />
-        <service android:name=".service.HeartRateService" />
-        <service
-            android:exported="false"
-            android:name=".service.jobs.DeleteDBJobService">
-            <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
-            </intent-filter>
-        </service>
-        <service android:name=".devices.wear.DataLayerListenerService" >
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
-            </intent-filter>
-        </service>
         <activity
             android:name=".activities.DebugActivity"
             android:label="@string/title_activity_debug"
@@ -80,6 +65,21 @@
         </activity>
         <activity android:name=".activities.GBActivity"
             android:theme="@style/GadgetbridgeTheme.NoActionBar" />
+
+        <service android:name=".service.DeviceCommunicationService" />
+        <service android:name=".service.HeartRateService" />
+        <service
+            android:exported="false"
+            android:name=".service.jobs.DeleteDBJobService">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
+        <service android:name=".devices.wear.DataLayerListenerService" >
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+            </intent-filter>
+        </service>
 
     </application>
 
