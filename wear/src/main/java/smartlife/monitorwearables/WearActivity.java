@@ -1,15 +1,20 @@
 package smartlife.monitorwearables;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
@@ -23,15 +28,19 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
 
     private static final String LOG_TAG = "MyHeart";
     private static final String TAG_WEAR_ACTIVITY = "WearActivity";
-
     private TextView mTextView;
     public static ServiceConnection sc;
     private int mChinSize;
     private View mainView;
+    private static SharedPreferences prefs;
+    public static Activity self;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        self = this;
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.wear_activity_main);
 
         ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BODY_SENSORS}, 1);
@@ -52,7 +61,7 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder binder) {
                 Log.d(LOG_TAG, "connected to service.");
-                // set our change listener to get change events
+                // set change listener to get change events
                 ((HeartbeatService.HeartbeatServiceBinder)binder).setChangeListener(WearActivity.this);
             }
 
@@ -61,7 +70,7 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
 
             }
         };
-        Intent intent = new Intent(WearActivity.this, HeartbeatService.class);
+        intent = new Intent(WearActivity.this, HeartbeatService.class);
         bindService(intent, sc, Service.BIND_AUTO_CREATE);
     }
 
@@ -72,16 +81,12 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
 
     @Override
     public void onValueChanged(int newValue) {
-        // will be called by the service whenever the heartbeat value changes.
+        // called by the service whenever the heartbeat value changes.
         mTextView.setText(Integer.toString(newValue));
-      /*  if (newValue > 90) {
-            vibrateOn();
-            alertText.setText("Chill out");
-        }else if(newValue > 80){
-            alertText.setText("Take it easy");
-        }else if(newValue > 70){
-            alertText.setText("Take a breath");
-        }*/
+    }
+
+    public Intent getHeartBeatIntent(){
+        return intent;
     }
 
     @Override
@@ -103,6 +108,18 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
     @Override
     public void onExitAmbient(){
         super.onExitAmbient();
+    }
+
+    public void toggleServiceRunning() {
+        if(prefs.getBoolean(self.getResources().getString(R.string.key_enable_continuous_monitoring), false)){
+          //  startService(intent);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    self.recreate();
+                }
+            });
+        }
     }
 
 }

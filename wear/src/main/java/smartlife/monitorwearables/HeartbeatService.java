@@ -3,13 +3,16 @@ package smartlife.monitorwearables;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -19,6 +22,7 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -34,6 +38,10 @@ public class HeartbeatService extends Service implements SensorEventListener {
     private OnChangeListener onChangeListener;
     private GoogleApiClient mGoogleApiClient;
     private PowerManager.WakeLock wakeLock;
+    Handler handler;
+    SharedPreferences prefs;
+    String[] monitorIntervals;
+    private Sensor mHeartRateSensor;
 
     // interface to pass a heartbeat value to the implementing class
     public interface OnChangeListener {
@@ -60,15 +68,32 @@ public class HeartbeatService extends Service implements SensorEventListener {
     @Override
     public void onCreate() {
         super.onCreate();
+        handler = new Handler();
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        monitorIntervals = getResources().getStringArray(R.array.hr_interval_array);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        Sensor mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+        mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         // delay SENSOR_DELAY_UI is sufficient
-        boolean res = mSensorManager.registerListener(this, mHeartRateSensor,  SensorManager.SENSOR_DELAY_UI);
-        Log.d(TAG_HEART_BEAT, " sensor registered: " + (res ? "yes" : "no"));
+        if(prefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false)){
+            boolean res = mSensorManager.registerListener(this, mHeartRateSensor,  SensorManager.SENSOR_DELAY_UI);
+            Log.d(TAG_HEART_BEAT, " sensor registered: " + (res ? "yes" : "no"));
+            mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
+            mGoogleApiClient.connect();
+          //  handler.post(processSensors);
+        }
+    }
 
+    public void unregisterListener(){
+        mSensorManager.unregisterListener(this, mHeartRateSensor);
+    }
+
+    public void registerListener(){
+        mSensorManager.registerListener(this, mHeartRateSensor,  SensorManager.SENSOR_DELAY_UI);
         mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
         mGoogleApiClient.connect();
     }
+
+
 
     @Override
     public void onRebind(Intent intent) {
@@ -78,26 +103,31 @@ public class HeartbeatService extends Service implements SensorEventListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
+     //   handler.removeCallbacks(processSensors);
         mSensorManager.unregisterListener(this);
         Log.d(TAG_HEART_BEAT," sensor unregistered");
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        // is this a heartbeat event and does it have data?
-        if(sensorEvent.sensor.getType()== Sensor.TYPE_HEART_RATE && sensorEvent.values.length>0 ) {
-            int newValue = Math.round(sensorEvent.values[0]);
-//            int newValue = 60;
-            //Log.d(TAG_HEART_BEAT,sensorEvent.sensor.getName() + " changed to: " + newValue);
-            // only do something if the value differs from the value before and the value is not 0.
-            if(currentValue != newValue && newValue!=0) {
-                // save the new value
-                currentValue = newValue;
-                // send the value to the listener
-                if(onChangeListener!=null) {
-                    Log.d(TAG_HEART_BEAT,new Date().toString() + ": Sending new value to listener: " + newValue);
-                    onChangeListener.onValueChanged(newValue);
-                    sendMessageToHandheld(Integer.toString(newValue));
+        if(!prefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false)){
+            unregisterListener();
+        } else {
+            // is this a heartbeat event and does it have data?
+            if (sensorEvent.sensor.getType() == Sensor.TYPE_HEART_RATE && sensorEvent.values.length > 0) {
+                int newValue = Math.round(sensorEvent.values[0]);
+                //            int newValue = 60;
+                //Log.d(TAG_HEART_BEAT,sensorEvent.sensor.getName() + " changed to: " + newValue);
+                // only do something if the value differs from the value before and the value is not 0.
+                if (currentValue != newValue && newValue != 0) {
+                    // save the new value
+                    currentValue = newValue;
+                    // send the value to the listener
+                    if (onChangeListener != null) {
+                        Log.d(TAG_HEART_BEAT, new Date().toString() + ": Sending new value to listener: " + newValue);
+                        onChangeListener.onValueChanged(newValue);
+                        sendMessageToHandheld(Integer.toString(newValue));
+                    }
                 }
             }
         }
