@@ -90,6 +90,8 @@
     <string name="spinner_monitor_interval_title">Set Monitor Interval</string>
     <string name="measure_now">Measure Now</string>
     <string name="sync_heart_rate">Sync heart rate</string>
+    <string name="key_monitor_interval">monitorInterval</string>
+    <string name="key_enable_continuous_monitoring">enableContinuousMonitoring</string>
 
     <string-array name="hr_interval_array">
         <item> </item>
