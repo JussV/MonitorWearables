@@ -49,7 +49,12 @@
         <activity
             android:name=".activities.DiscoveryActivity"
             android:label="@string/title_activity_discovery"
-            android:parentActivityName=".activities.ControlCenterv2" />
+            android:parentActivityName=".activities.ControlCenterv2" >
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />
+                <data android:host="*" android:scheme="wear" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".devices.miband.MiBandPairingActivity"
             android:label="@string/title_activity_mi_band_pairing" />

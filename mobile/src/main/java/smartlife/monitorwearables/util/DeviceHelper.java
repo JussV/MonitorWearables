@@ -22,6 +22,11 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Wearable;
+
+import org.w3c.dom.Node;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +39,7 @@ import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.devices.miband.MiBand2Coordinator;
 import smartlife.monitorwearables.devices.miband.MiBandConst;
 import smartlife.monitorwearables.devices.miband.MiBandCoordinator;
+import smartlife.monitorwearables.devices.wear.AndroidWearCoordinator;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.impl.GBDeviceCandidate;
 import smartlife.monitorwearables.model.DeviceType;
@@ -165,8 +171,9 @@ public class DeviceHelper {
 
     private List<DeviceCoordinator> createCoordinators() {
         List<DeviceCoordinator> result = new ArrayList<>();
-        result.add(new MiBand2Coordinator()); // Note: MiBand2 must come before MiBand because detection is hacky, atm
+        result.add(new MiBand2Coordinator()); // Note: MiBand2 must be before MiBand
         result.add(new MiBandCoordinator());
+        result.add(new AndroidWearCoordinator());
 
         return result;
     }

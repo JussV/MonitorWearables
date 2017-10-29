@@ -30,7 +30,9 @@ public enum DeviceType {
     UNKNOWN(-1, R.drawable.unknown_device, R.drawable.unknown_device_disabled),
     MIBAND(10, R.drawable.miband, R.drawable.miband2_disabled),
     MIBAND2(11, R.drawable.miband, R.drawable.miband2_disabled),
+    ANDROIDWEAR(200, R.drawable.android_wear, R.drawable.android_wear_disabled),
     TEST(1000, R.drawable.unknown_device, R.drawable.unknown_device_disabled);
+
 
     private final int key;
     @DrawableRes

@@ -130,6 +130,13 @@ public class DeviceRecyclerViewAdapter  extends RecyclerView.Adapter<DeviceRecyc
                 holder.deviceImageView.setImageResource(R.drawable.miband2_disabled);
         }
 
+        if (device.getType().getKey() == DeviceType.ANDROIDWEAR.getKey()) {
+            if (device.isInitialized()) {
+                holder.deviceImageView.setImageResource(R.drawable.android_wear);
+            }
+            else
+                holder.deviceImageView.setImageResource(R.drawable.android_wear_disabled);
+        }
         holder.deviceNameLabel.setText(device.getName());
         holder.deviceMacAddress.setText(device.getAddress());
 
