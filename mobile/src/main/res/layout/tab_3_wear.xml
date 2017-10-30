@@ -1,0 +1,77 @@
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/img_heart_rate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:contentDescription="@string/hr_monitor"
+            android:src="@drawable/ic_heart_pulse_grey600_24dp"/>
+
+        <Switch
+            android:id="@+id/switch_heartrate_monitor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/img_heart_rate"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:textSize="@dimen/primary_text"
+            android:text="@string/hr_monitor" />
+
+        <TextView
+            android:id="@+id/tv_heart_rate_monitor_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/switch_heartrate_monitor"
+            android:layout_below="@id/switch_heartrate_monitor"
+            android:textSize="@dimen/secondary_text"
+            android:textColor="@color/secondarytext"
+            android:layout_marginBottom="15dp"
+            android:text="@string/hr_continuous_measurement"/>
+
+        <View
+            android:id="@+id/divider_1"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/tv_heart_rate_monitor_txt"
+            android:background="@color/divider"/>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/tv_secondary_monitor_interval"
+            android:background="@color/divider"/>
+
+        <ImageView
+            android:id="@+id/img_day_night_monitoring"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/divider_1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="120dp"
+            android:adjustViewBounds="true"
+            android:alpha="0.4"
+            android:contentDescription="@string/hr_monitor"
+            android:maxHeight="80dp"
+            android:maxWidth="80dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/day_night_monitoring" />
+        <TextView
+            android:id="@+id/tv_wear_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/img_day_night_monitoring"
+            android:textSize="@dimen/secondary_text"
+            android:textColor="@color/secondarytext"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="55dp"
+            android:layout_marginEnd="55dp"
+            android:gravity="center"
+            android:text="@string/wear_info_continuous_measurement"/>
+    </RelativeLayout>

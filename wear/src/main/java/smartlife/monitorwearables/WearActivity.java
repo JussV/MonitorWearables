@@ -111,7 +111,7 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
     }
 
     public void toggleServiceRunning() {
-        if(prefs.getBoolean(self.getResources().getString(R.string.key_enable_continuous_monitoring), false)){
+        if(prefs.getBoolean(self.getResources().getString(R.string.key_enable_wear_continuous_monitoring), false)){
           //  startService(intent);
             runOnUiThread(new Runnable() {
                 @Override

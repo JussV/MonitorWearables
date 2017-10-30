@@ -36,9 +36,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import smartlife.monitorwearables.activities.CollectionDemoActivity;
 import smartlife.monitorwearables.devices.miband.operations.InitOperation;
-import smartlife.monitorwearables.fragments.TabFragment2;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.model.DeviceService;
 import smartlife.monitorwearables.model.NotificationSpec;

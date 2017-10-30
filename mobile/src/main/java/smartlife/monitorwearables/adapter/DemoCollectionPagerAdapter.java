@@ -1,20 +1,14 @@
 package smartlife.monitorwearables.adapter;
 
-import android.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.SparseArray;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import smartlife.monitorwearables.fragments.TabFragment1;
-import smartlife.monitorwearables.fragments.TabFragment2;
-import smartlife.monitorwearables.fragments.TabFragment3;
+import smartlife.monitorwearables.fragments.miband.TabFragment1;
+import smartlife.monitorwearables.fragments.miband.TabFragment2;
+import smartlife.monitorwearables.fragments.miband.TabFragment3;
 
 /**
  * Created by Joana on 8/15/2017.

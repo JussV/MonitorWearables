@@ -18,4 +18,6 @@ public class Constants {
     public static final String HR_COLUMN_DEVICE = "device";
     public static final String HR_COLUMN_UPID = "uniquePhoneId";
     public static final String HR_COLUMN_VALUE = "value";
+
+    public static final String DEVICE_TYPE="deviceType";
 }

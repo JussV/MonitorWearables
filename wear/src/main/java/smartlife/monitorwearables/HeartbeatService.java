@@ -74,7 +74,7 @@ public class HeartbeatService extends Service implements SensorEventListener {
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         // delay SENSOR_DELAY_UI is sufficient
-        if(prefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false)){
+        if(prefs.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring), false)){
             boolean res = mSensorManager.registerListener(this, mHeartRateSensor,  SensorManager.SENSOR_DELAY_UI);
             Log.d(TAG_HEART_BEAT, " sensor registered: " + (res ? "yes" : "no"));
             mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
@@ -110,7 +110,7 @@ public class HeartbeatService extends Service implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if(!prefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false)){
+        if(!prefs.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring), false)){
             unregisterListener();
         } else {
             // is this a heartbeat event and does it have data?

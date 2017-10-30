@@ -1,4 +1,4 @@
-package smartlife.monitorwearables.fragments;
+package smartlife.monitorwearables.fragments.wear;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

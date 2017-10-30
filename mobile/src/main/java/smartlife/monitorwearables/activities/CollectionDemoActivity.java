@@ -17,21 +17,17 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.underscore.$;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
@@ -44,9 +40,9 @@ import smartlife.monitorwearables.db.HRMonitorContract;
 import smartlife.monitorwearables.db.HRMonitorLocalDBOperations;
 import smartlife.monitorwearables.entities.Device;
 import smartlife.monitorwearables.entities.HeartRate;
-import smartlife.monitorwearables.fragments.TabFragment1;
-import smartlife.monitorwearables.fragments.TabFragment2;
-import smartlife.monitorwearables.fragments.TabFragment3;
+import smartlife.monitorwearables.fragments.miband.TabFragment1;
+import smartlife.monitorwearables.fragments.miband.TabFragment2;
+import smartlife.monitorwearables.fragments.miband.TabFragment3;
 import smartlife.monitorwearables.model.DeviceType;
 import smartlife.monitorwearables.service.HeartRateService;
 import smartlife.monitorwearables.service.volley.VolleyCallback;
@@ -74,6 +70,8 @@ public class CollectionDemoActivity extends GBActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Intent intent = getIntent();
+        Integer deviceType = (Integer)intent.getExtras().get(Constants.DEVICE_TYPE);
 
         this.setTitle("Heart rate");
         setContentView(R.layout.activity_collection_demo);
@@ -102,11 +100,15 @@ public class CollectionDemoActivity extends GBActivity {
         tabLayout.getTabAt(TAB_LIVE_HR).setCustomView(secondTab);
 
         Bundle page = new Bundle();
-        fragments.add(Fragment.instantiate(this, TabFragment1.class.getName(), page));
-        fragments.add(Fragment.instantiate(this, TabFragment2.class.getName(), page));
-        fragments.add(Fragment.instantiate(this, TabFragment3.class.getName(), page));
-
-     //   tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        if(deviceType == DeviceType.MIBAND2.getKey()){
+            fragments.add(Fragment.instantiate(this, TabFragment1.class.getName(), page));
+            fragments.add(Fragment.instantiate(this, TabFragment2.class.getName(), page));
+            fragments.add(Fragment.instantiate(this, TabFragment3.class.getName(), page));
+        } else if(deviceType == DeviceType.ANDROIDWEAR.getKey()){
+            fragments.add(Fragment.instantiate(this, TabFragment1.class.getName(), page));
+            fragments.add(Fragment.instantiate(this, smartlife.monitorwearables.fragments.wear.TabFragment2.class.getName(), page));
+            fragments.add(Fragment.instantiate(this, smartlife.monitorwearables.fragments.wear.TabFragment3.class.getName(), page));
+        }
 
         viewPager = (ViewPager) findViewById(R.id.pager);
 

@@ -38,11 +38,11 @@ import com.felkertech.settingsmanager.SettingsManager;
 
 import java.util.List;
 
+import smartlife.monitorwearables.Constants;
 import smartlife.monitorwearables.GBApplication;
 import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.activities.CollectionDemoActivity;
 import smartlife.monitorwearables.devices.DeviceManager;
-import smartlife.monitorwearables.fragments.TabFragment3;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.model.DeviceType;
 import smartlife.monitorwearables.service.ContinuousMeasureScheduler;
@@ -60,10 +60,10 @@ public class DeviceRecyclerViewAdapter  extends RecyclerView.Adapter<DeviceRecyc
     private final Context context;
     private List<GBDevice> deviceList;
     private ViewGroup parent;
-  //  private static Prefs prefs;
-  //  private static SharedPreferences sharedPrefs;
+    private static Prefs prefs;
+    private static SharedPreferences sharedPrefs;
     private ContinuousMeasureScheduler scheduler;
-    private SettingsManager mSettingsManager;
+   // private SettingsManager mSettingsManager;
 
     public DeviceRecyclerViewAdapter(Context context, List<GBDevice> deviceList) {
         this.context = context;
@@ -84,10 +84,10 @@ public class DeviceRecyclerViewAdapter  extends RecyclerView.Adapter<DeviceRecyc
         final GBDevice device = deviceList.get(position);
 
         //auto connect to last connected device
-       /* sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        prefs = new Prefs(sharedPrefs);*/
-        mSettingsManager = new SettingsManager(context);
-        if(!device.isConnected() && device.getAddress().equals(mSettingsManager.getString(DeviceCommunicationService.LAST_DEVICE_ADDRESS, ""))){
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs = new Prefs(sharedPrefs);
+      //  mSettingsManager = new SettingsManager(context);
+        if(!device.isConnected() && device.getAddress().equals(prefs.getString(DeviceCommunicationService.LAST_DEVICE_ADDRESS, ""))){
             GBApplication.deviceService().connect(device);
         }
 
@@ -118,10 +118,10 @@ public class DeviceRecyclerViewAdapter  extends RecyclerView.Adapter<DeviceRecyc
         if (device.getType().getKey() == DeviceType.MIBAND2.getKey()) {
             if (device.isInitialized()) {
                 holder.deviceImageView.setImageResource(R.drawable.miband);
-                int monitorIntervalPos = mSettingsManager.getInt(R.string.key_monitor_interval);
+                int monitorIntervalPos = prefs.getInt(context.getResources().getString(R.string.key_monitor_interval),0);
                 String monitorIntervalStr = context.getResources().getStringArray(R.array.hr_interval_array)[monitorIntervalPos];
                 int monitorInterval = !monitorIntervalStr.equals("") ? Integer.valueOf(monitorIntervalStr) : 0;
-                if(mSettingsManager.getBoolean(R.string.key_enable_continuous_monitoring, false) &&  monitorInterval> 0){
+                if(prefs.getBoolean(context.getResources().getString(R.string.key_enable_continuous_monitoring), false) &&  monitorInterval> 0){
                   //  context.startService(new Intent(context, ContinuousMeasureService.class));
                     scheduler.init(monitorInterval);
                 }
@@ -187,7 +187,9 @@ public class DeviceRecyclerViewAdapter  extends RecyclerView.Adapter<DeviceRecyc
 
             @Override
             public void onClick(View v) {
-                context.startActivity(new Intent(context, CollectionDemoActivity.class));
+                Intent intent = new Intent(context, CollectionDemoActivity.class);
+                intent.putExtra(Constants.DEVICE_TYPE, device.getType().getKey());
+                context.startActivity(intent);
             }
 
         });
@@ -219,7 +221,6 @@ public class DeviceRecyclerViewAdapter  extends RecyclerView.Adapter<DeviceRecyc
         ViewHolder(View view) {
             super(view);
             container = (CardView) view.findViewById(R.id.card_view);
-
             deviceImageView = (ImageView) view.findViewById(R.id.device_image);
             deviceNameLabel = (TextView) view.findViewById(R.id.device_name);
             deviceStatusLabel = (TextView) view.findViewById(R.id.device_status);
