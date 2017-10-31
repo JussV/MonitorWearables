@@ -4,16 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.wearable.activity.WearableActivity;
@@ -22,16 +17,17 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.widget.TextView;
 
+import com.felkertech.settingsmanager.SettingsManager;
+
+import java.util.Locale;
+
 
 public class WearActivity extends WearableActivity implements HeartbeatService.OnChangeListener {
 
-
-    private static final String LOG_TAG = "MyHeart";
     private static final String TAG_WEAR_ACTIVITY = "WearActivity";
     private TextView mTextView;
     public static ServiceConnection sc;
     private int mChinSize;
-    private View mainView;
     private static SharedPreferences prefs;
     public static Activity self;
     private Intent intent;
@@ -40,12 +36,13 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         self = this;
+
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.wear_activity_main);
 
         ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BODY_SENSORS}, 1);
 
-        mainView = findViewById(R.id.box_inset);
+        View mainView = findViewById(R.id.box_inset);
         mainView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
             @Override
             public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
@@ -60,7 +57,7 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
         sc = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder binder) {
-                Log.d(LOG_TAG, "connected to service.");
+                Log.d(TAG_WEAR_ACTIVITY, "connected to service.");
                 // set change listener to get change events
                 ((HeartbeatService.HeartbeatServiceBinder)binder).setChangeListener(WearActivity.this);
             }
@@ -82,7 +79,7 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
     @Override
     public void onValueChanged(int newValue) {
         // called by the service whenever the heartbeat value changes.
-        mTextView.setText(Integer.toString(newValue));
+        mTextView.setText(String.format(Locale.getDefault(), "%d", newValue));
     }
 
     public Intent getHeartBeatIntent(){
@@ -112,7 +109,6 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
 
     public void toggleServiceRunning() {
         if(prefs.getBoolean(self.getResources().getString(R.string.key_enable_wear_continuous_monitoring), false)){
-          //  startService(intent);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

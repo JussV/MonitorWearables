@@ -299,11 +299,35 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
     }
 
     public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
-        if(capabilityInfo.getNodes().size() > 0){
-            Log.d(TAG, "Device Connected");
+        Set<Node> connectedNodes = capabilityInfo.getNodes();
+        Node connectedNode = pickBestNode(connectedNodes);
+        if(connectedNode != null){
+            Log.d(TAG, "Wear Connected");
+            for(GBDevice device: deviceList) {
+                if (device.getType() == DeviceType.ANDROIDWEAR && connectedNode.getDisplayName().equals(device.getName())) {
+                    device.setState(GBDevice.State.INITIALIZED);
+                }
+            }
         }else{
-            Log.d(TAG, "No Devices");
+            Log.d(TAG, "Wear not connected");
+            for(GBDevice device: deviceList) {
+                if (device.getType() == DeviceType.ANDROIDWEAR) {
+                    device.setState(GBDevice.State.NOT_CONNECTED);
+                }
+            }
         }
+    }
+
+    private Node pickBestNode(Set<Node> nodes) {
+        Node bestNode = null;
+        // Find a nearby node or pick one arbitrarily
+        for (Node node : nodes) {
+            if (node.isNearby()) {
+                return node;
+            }
+            bestNode = node;
+        }
+        return bestNode;
     }
 
     /**

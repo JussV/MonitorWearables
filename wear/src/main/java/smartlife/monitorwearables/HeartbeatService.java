@@ -15,6 +15,7 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.felkertech.settingsmanager.SettingsManager;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -42,6 +43,7 @@ public class HeartbeatService extends Service implements SensorEventListener {
     SharedPreferences prefs;
     String[] monitorIntervals;
     private Sensor mHeartRateSensor;
+    private SettingsManager mSettingsManager;
 
     // interface to pass a heartbeat value to the implementing class
     public interface OnChangeListener {
@@ -69,13 +71,18 @@ public class HeartbeatService extends Service implements SensorEventListener {
     public void onCreate() {
         super.onCreate();
         handler = new Handler();
+        mSettingsManager = new SettingsManager(this);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         monitorIntervals = getResources().getStringArray(R.array.hr_interval_array);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+        //batching is not supported for Moto 360 Sport, because this fifoSize value is 0.
+        int fifoSize = mHeartRateSensor.getFifoReservedEventCount();
+        int fifoMax = mHeartRateSensor.getFifoMaxEventCount();
         // delay SENSOR_DELAY_UI is sufficient
-        if(prefs.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring), false)){
-            boolean res = mSensorManager.registerListener(this, mHeartRateSensor,  SensorManager.SENSOR_DELAY_UI);
+       // if(prefs.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring), false)){
+        if(mSettingsManager.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring), false)){
+            boolean res = mSensorManager.registerListener(this, mHeartRateSensor,  600000000);
             Log.d(TAG_HEART_BEAT, " sensor registered: " + (res ? "yes" : "no"));
             mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
             mGoogleApiClient.connect();
@@ -88,7 +95,7 @@ public class HeartbeatService extends Service implements SensorEventListener {
     }
 
     public void registerListener(){
-        mSensorManager.registerListener(this, mHeartRateSensor,  SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, mHeartRateSensor,  600000000);
         mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
         mGoogleApiClient.connect();
     }
