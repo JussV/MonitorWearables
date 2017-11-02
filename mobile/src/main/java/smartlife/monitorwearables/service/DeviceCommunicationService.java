@@ -56,6 +56,7 @@ import smartlife.monitorwearables.externalevents.BluetoothConnectReceiver;
 import smartlife.monitorwearables.externalevents.BluetoothPairingRequestReceiver;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.model.NotificationSpec;
+import smartlife.monitorwearables.service.volley.VolleyOperations;
 import smartlife.monitorwearables.service.volley.VolleySingleton;
 import smartlife.monitorwearables.util.DeviceHelper;
 import smartlife.monitorwearables.util.GB;
@@ -98,32 +99,19 @@ import static smartlife.monitorwearables.model.DeviceService.EXTRA_VIBRATION_INT
 
 public class DeviceCommunicationService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    @SuppressLint("StaticFieldLeak") // only used for test cases
+    @SuppressLint("StaticFieldLeak")
     private static DeviceSupportFactory DEVICE_SUPPORT_FACTORY = null;
-
     public final static String LAST_DEVICE_ADDRESS = "last_device_address";
 
     private boolean mStarted = false;
-
     private DeviceSupportFactory mFactory;
     private GBDevice mGBDevice = null;
     private DeviceSupport mDeviceSupport;
-
-   // private TimeChangeReceiver mTimeChangeReceiver = null;
     private BluetoothConnectReceiver mBlueToothConnectReceiver = null;
     private BluetoothPairingRequestReceiver mBlueToothPairingRequestReceiver = null;
 
     private Random mRandom = new Random();
 
-
-    /**
-     * For testing!
-     *
-     * @param factory
-     */
-    public static void setDeviceSupportFactory(DeviceSupportFactory factory) {
-        DEVICE_SUPPORT_FACTORY = factory;
-    }
 
     public DeviceCommunicationService() { }
 
@@ -137,9 +125,6 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
                     mGBDevice = device;
                     boolean enableReceivers = mDeviceSupport != null && (mDeviceSupport.useAutoConnect() || mGBDevice.isInitialized());
                     setReceiversEnableState(enableReceivers, mGBDevice.isInitialized(), DeviceHelper.getInstance().getCoordinator(device));
-                  //  GB.updateNotification(mGBDevice.getName() + " " + mGBDevice.getStateString(), mGBDevice.isInitialized(), context);
-                } else {
-                   // LOG.error("Got ACTION_DEVICE_CHANGED from unexpected device: " + device);
                 }
             }
         }
@@ -147,7 +132,6 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
 
     @Override
     public void onCreate() {
-       // LOG.debug("DeviceCommunicationService is being created");
         super.onCreate();
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter(GBDevice.ACTION_DEVICE_CHANGED));
         mFactory = getDeviceSupportFactory();
@@ -179,8 +163,6 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
          //   LOG.info("no action");
             return START_NOT_STICKY;
         }
-
-      //  LOG.debug("Service startcommand: " + action);
 
         if (!action.equals(ACTION_START) && !action.equals(ACTION_CONNECT)) {
             if (!mStarted) {
@@ -248,7 +230,7 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
                                 @Override
                                 public void onResponse(JSONArray response) {
                                    // if gbDevice's key is not in remote db add it
-                                    List<Integer> remoteDeviceKeys = new ArrayList<Integer>();
+                                    List<Integer> remoteDeviceKeys = new ArrayList<>();
                                     for (int i = 0; i < response.length() ; i++) {
                                         try {
                                             JSONObject mJsonObject = (JSONObject)response.get(i);
@@ -262,7 +244,7 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
                                         try {
                                             device.put(Constants.DEVICE_KEY, gbDeviceFinal.getType().getKey());
                                             device.put(Constants.DEVICE_NAME, gbDeviceFinal.getName());
-                                            addDeviceToRemoteDb(device);
+                                            VolleyOperations.addDeviceToRemoteDb(device, getApplicationContext());
                                         } catch (JSONException ex){
                                             ex.printStackTrace();
                                         }
@@ -404,9 +386,7 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
 
     /**
      * Disposes the current DeviceSupport instance (if any) and sets a new device support instance
-     * (if not null).
-     *
-     * @param deviceSupport
+     * (if not null)
      */
     private void setDeviceSupport(@Nullable DeviceSupport deviceSupport) {
         if (deviceSupport != mDeviceSupport && mDeviceSupport != null) {
@@ -481,7 +461,7 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
 
         setDeviceSupport(null);
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.cancel(GB.NOTIFICATION_ID); // need to do this because the updated notification won't be cancelled when service stops
+        nm.cancel(GB.NOTIFICATION_ID);
     }
 
     @Override
@@ -515,22 +495,6 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
         return mGBDevice;
     }
 
-    private void addDeviceToRemoteDb(JSONObject device){
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-            (Request.Method.POST, Constants.URL.concat(Constants.DEVICE_API), device, new Response.Listener<JSONObject>() {
 
-                @Override
-                public void onResponse(JSONObject response) {
-                    int i = 0;
-                }
-            }, new Response.ErrorListener() {
-
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    error.printStackTrace();
-                }
-            });
-        VolleySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
-    }
 
 }

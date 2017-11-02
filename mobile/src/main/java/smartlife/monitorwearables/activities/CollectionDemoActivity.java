@@ -71,7 +71,7 @@ public class CollectionDemoActivity extends GBActivity {
         super.onCreate(savedInstanceState);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         Intent intent = getIntent();
-        Integer deviceType = (Integer)intent.getExtras().get(Constants.DEVICE_TYPE);
+        final Integer deviceType = (Integer)intent.getExtras().get(Constants.DEVICE_TYPE);
 
         this.setTitle("Heart rate");
         setContentView(R.layout.activity_collection_demo);
@@ -110,7 +110,7 @@ public class CollectionDemoActivity extends GBActivity {
             fragments.add(Fragment.instantiate(this, smartlife.monitorwearables.fragments.wear.TabFragment3.class.getName(), page));
         }
 
-        viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager = findViewById(R.id.pager);
 
         final PagerAdapter adapter = new DemoCollectionPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), fragments);
         viewPager.setAdapter(adapter);
@@ -134,7 +134,7 @@ public class CollectionDemoActivity extends GBActivity {
             }
         });
 
-        syncHR = (ImageView) findViewById(R.id.iv_sync_hr);
+        syncHR = findViewById(R.id.iv_sync_hr);
         syncHR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,8 +163,7 @@ public class CollectionDemoActivity extends GBActivity {
                                     hrObj.put(Constants.HR_COLUMN_DATE, heartRate.getCreatedAt());
                                     hrObj.put(Constants.HR_COLUMN_VALUE, heartRate.getValue());
                                     hrObj.put(Constants.HR_COLUMN_UPID, uniquePhoneId);
-                                    // TODO: deviceType should be taken from the device
-                                    hrObj.put(Constants.HR_COLUMN_DEVICE, DeviceType.MIBAND2.getKey());
+                                    hrObj.put(Constants.HR_COLUMN_DEVICE, deviceType);
                                     mJSONArray.put(hrObj);
                                 }catch (JSONException ex){
                                     ex.printStackTrace();
@@ -198,8 +197,7 @@ public class CollectionDemoActivity extends GBActivity {
                                 hrObj.put(Constants.HR_COLUMN_DATE, heartRate.getCreatedAt());
                                 hrObj.put(Constants.HR_COLUMN_VALUE, heartRate.getValue());
                                 hrObj.put(Constants.HR_COLUMN_UPID, uniquePhoneId);
-                                // TODO: deviceType should be taken from the device
-                                hrObj.put(Constants.HR_COLUMN_DEVICE, DeviceType.MIBAND2.getKey());
+                                hrObj.put(Constants.HR_COLUMN_DEVICE, deviceType);
                                 mJSONArray.put(hrObj);
                             }catch (JSONException ex){
                                 ex.printStackTrace();
@@ -285,8 +283,7 @@ public class CollectionDemoActivity extends GBActivity {
     }
 
     private Fragment getCurrentFragment() {
-        Fragment fragment = (Fragment) ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(viewPager.getCurrentItem());
-        return fragment;
+        return ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(viewPager.getCurrentItem());
     }
 
 

@@ -36,7 +36,7 @@ import smartlife.monitorwearables.util.AndroidUtils;
  */
 
 public class DeleteDBJobService extends JobService {
-    private AsyncTask mBackgroundTask;
+    private static AsyncTask mBackgroundTask;
     private int deletedRows;
     private CountDownLatch latch;
 
@@ -152,20 +152,5 @@ public class DeleteDBJobService extends JobService {
     @Override
     public boolean onStopJob(JobParameters job) {
         return false; // Answers the question: "Should this job be retried?"
-    }
-
-    private Bitmap download_Image(String url) {
-
-        Bitmap bmp =null;
-        try{
-            URL ulrn = new URL(url);
-            HttpURLConnection con = (HttpURLConnection)ulrn.openConnection();
-            InputStream is = con.getInputStream();
-            bmp = BitmapFactory.decodeStream(is);
-            if (null != bmp)
-                return bmp;
-
-        }catch(Exception e){}
-        return bmp;
     }
 }

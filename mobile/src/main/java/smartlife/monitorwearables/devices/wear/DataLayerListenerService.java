@@ -1,6 +1,8 @@
 package smartlife.monitorwearables.devices.wear;
 
+import android.content.Intent;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.wearable.MessageEvent;
@@ -40,13 +42,15 @@ public class DataLayerListenerService extends WearableListenerService {
     }
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-        super.onMessageReceived(messageEvent);
-        Log.d(LOG_TAG, "received a message from wear: " + messageEvent.getPath());
-        // save the new heartbeat value
-        currentValue = Integer.parseInt(messageEvent.getPath());
-        if(handler!=null) {
-            // if a handler is registered, send the value as new message
-            handler.sendEmptyMessage(currentValue);
+        if (messageEvent.getPath().equals("/wear/heartRate")) {
+            final String message = new String(messageEvent.getData());
+            Log.v("pactchat", "Message path received on watch is: " + messageEvent.getPath());
+            Log.v("packtchat", "Message received on watch is: " + message);
+
+            //store value to db
+        }
+        else {
+            super.onMessageReceived(messageEvent);
         }
     }
 

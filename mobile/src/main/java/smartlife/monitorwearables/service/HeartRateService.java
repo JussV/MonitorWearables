@@ -51,11 +51,11 @@ public class HeartRateService extends IntentService {
         values.put(HRMonitorContract.HeartRate.COLUMN_CREATED_AT, System.currentTimeMillis());
         // Insert the new row, returning the primary key value of the new row
         long newRowId = db.insert(HRMonitorContract.HeartRate.TABLE_NAME, null, values);
+        db.close();
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(CollectionDemoActivity.ACTION_BROADCAST_HR);
         broadcastIntent.putExtra(EXTRA_LIVE_HR, heartRate);
         LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
-
     }
 
     public static void startMeasureHeartRate(Context context, long heartRate) {

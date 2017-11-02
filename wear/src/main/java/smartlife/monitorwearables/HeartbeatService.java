@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.felkertech.settingsmanager.SettingsManager;
@@ -23,6 +24,7 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -140,7 +142,28 @@ public class HeartbeatService extends Service implements SensorEventListener {
         }
     }
 
+    private void sendMessageToHandheld(final String message) {
 
+        if (mGoogleApiClient == null)
+            return;
+
+        // use the api client to send the heartbeat value to our handheld
+        final PendingResult<NodeApi.GetConnectedNodesResult> nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient);
+        nodes.setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+            @Override
+            public void onResult(@NonNull NodeApi.GetConnectedNodesResult result) {
+                final List<Node> nodes = result.getNodes();
+                final String path = "/wear/heartRate";
+
+                for (Node node : nodes) {
+                    Log.d(TAG_HEART_BEAT, "Send message to handheld: " + message);
+
+                    byte[] data = message.getBytes(StandardCharsets.UTF_8);
+                    Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, data);
+                }
+            }
+        });
+    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
@@ -152,7 +175,7 @@ public class HeartbeatService extends Service implements SensorEventListener {
      * sends a string message to the connected handheld using the google api client (if available)
      * @param message
      */
-    private void sendMessageToHandheld(final String message) {
+   /* private void sendMessageToHandheld(final String message) {
 
         if (mGoogleApiClient == null)
             return;
@@ -174,5 +197,5 @@ public class HeartbeatService extends Service implements SensorEventListener {
             }
         });
 
-    }
+    }*/
 }

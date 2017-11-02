@@ -81,7 +81,7 @@ public class TabFragment1 extends Fragment {
             heartRateArray.add(heartRateItem);
         }
         cursor.close();
-
+        db.close();
         mAdapter = new HeartRateAdapter(heartRateArray);
         mRecyclerView.setAdapter(mAdapter);
         mLayoutManager = new LinearLayoutManager(getContext());

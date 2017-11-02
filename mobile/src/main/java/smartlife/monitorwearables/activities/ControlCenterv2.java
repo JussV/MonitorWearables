@@ -49,31 +49,39 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.CapabilityApi;
 import com.google.android.gms.wearable.CapabilityInfo;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
+import smartlife.monitorwearables.Constants;
+import smartlife.monitorwearables.GBApplication;
 import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.adapter.DeviceRecyclerViewAdapter;
 import smartlife.monitorwearables.devices.DeviceManager;
 import smartlife.monitorwearables.devices.wear.DataLayerListenerService;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.model.DeviceType;
+import smartlife.monitorwearables.service.volley.VolleyOperations;
+import smartlife.monitorwearables.service.volley.VolleySingleton;
 import smartlife.monitorwearables.util.GB;
 import smartlife.monitorwearables.util.Prefs;
-import smartlife.monitorwearables.GBApplication;
 
 public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.CapabilityListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, NavigationView.OnNavigationItemSelectedListener {
 
@@ -123,10 +131,10 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controlcenterv2);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,23 +142,23 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.controlcenter_navigation_drawer_open, R.string.controlcenter_navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         //end of material design boilerplate
         deviceManager = ((GBApplication) getApplication()).getDeviceManager();
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiInfo = wifiManager.getConnectionInfo();
-        deviceListView = (RecyclerView) findViewById(R.id.deviceListView);
+        deviceListView = findViewById(R.id.deviceListView);
         deviceListView.setHasFixedSize(true);
         deviceListView.setLayoutManager(new LinearLayoutManager(this));
-        background = (ImageView) findViewById(R.id.no_items_bg);
+        background = findViewById(R.id.no_items_bg);
 
         deviceList = deviceManager.getDevices();
         //Android Wear devices are discovered by using Wearable API
@@ -224,7 +232,7 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -235,7 +243,7 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
 
         switch (item.getItemId()) {
@@ -288,7 +296,7 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e(TAG, "onConnectionFailed(): Failed to connect, with result: " + connectionResult);
     }
 
@@ -351,6 +359,8 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
                         }
                         if(device.getType()==DeviceType.ANDROIDWEAR && device.getName().equals(node.getDisplayName())){
                             device.setState(GBDevice.State.INITIALIZED);
+                            // Store connected device in remote db
+                            VolleyOperations.storeDeviceToRemoteDB(device, getApplicationContext());
                         }
                     }
                 }
