@@ -36,11 +36,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import smartlife.monitorwearables.activities.CollectionDemoActivity;
 import smartlife.monitorwearables.devices.miband.operations.InitOperation;
-import smartlife.monitorwearables.fragments.TabFragment2;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.model.DeviceService;
+import smartlife.monitorwearables.model.DeviceType;
 import smartlife.monitorwearables.model.NotificationSpec;
 import smartlife.monitorwearables.service.BLETypeConversions;
 import smartlife.monitorwearables.service.HeartRateService;
@@ -458,12 +457,7 @@ public class MiBand2Support extends AbstractBTLEDeviceSupport {
             return true;
         } else if (GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_MEASUREMENT.equals(characteristicUUID)) {
             int heartRate = handleHeartrate(characteristic.getValue());
-          //  Intent displayHRIntent = new Intent();
-           /* displayHRIntent.setAction(CollectionDemoActivity.ACTION_DISPLAY_HR);
-            displayHRIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            displayHRIntent.putExtra(CollectionDemoActivity.EXTRA_LIVE_HR, heartRate);
-            getContext().startActivity(displayHRIntent);*/
-            HeartRateService.startMeasureHeartRate(getContext(), heartRate);
+            HeartRateService.startMeasureHeartRate(getContext(), heartRate, DeviceType.MIBAND2.getKey());
             return true;
         } else if (MiBand2Service.UUID_CHARACTERISTIC_AUTH.equals(characteristicUUID)) {
       //      LOG.info("AUTHENTICATION?? " + characteristicUUID);

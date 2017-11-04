@@ -90,8 +90,10 @@
     <string name="spinner_monitor_interval_title">Set Monitor Interval</string>
     <string name="measure_now">Measure Now</string>
     <string name="sync_heart_rate">Sync heart rate</string>
+    <string name="wear_info_continuous_measurement">If Heart Rate Monitor switch is enabled, heart rate sensor of Android Wear continuously measures the heart rate few times a second. No monitor interval should be set for wear devices. </string>
     <string name="key_monitor_interval">monitorInterval</string>
     <string name="key_enable_continuous_monitoring">enableContinuousMonitoring</string>
+    <string name="key_enable_wear_continuous_monitoring">enableWearContinuousMonitoring</string>
 
     <string-array name="hr_interval_array">
         <item> </item>

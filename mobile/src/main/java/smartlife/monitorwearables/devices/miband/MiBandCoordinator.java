@@ -39,10 +39,8 @@ import smartlife.monitorwearables.util.Prefs;
 
 
 public class MiBandCoordinator extends AbstractDeviceCoordinator {
-    //private static final Logger LOG = LoggerFactory.getLogger(MiBandCoordinator.class);
 
-    public MiBandCoordinator() {
-    }
+    public MiBandCoordinator() {}
 
     @NonNull
     @Override
@@ -78,13 +76,6 @@ public class MiBandCoordinator extends AbstractDeviceCoordinator {
             //LOG.error("unable to check device support", ex);
         }
         return DeviceType.UNKNOWN;
-    }
-
-    @Override
-    protected void deleteDevice(GBDevice gbDevice, Device device, DaoSession session) throws Exception {
-        Long deviceId = device.getId();
-      /*  QueryBuilder<?> qb = session.getMiBandActivitySampleDao().queryBuilder();
-        qb.where(MiBandActivitySampleDao.Properties.DeviceId.eq(deviceId)).buildDelete().executeDeleteWithoutDetachingEntities();*/
     }
 
     @Override
@@ -202,7 +193,6 @@ public class MiBandCoordinator extends AbstractDeviceCoordinator {
 
     @Override
     public Class<? extends Activity> getPrimaryActivity() {
-        /*return ChartsActivity.class; */
         return null;
     }
 
@@ -213,19 +203,5 @@ public class MiBandCoordinator extends AbstractDeviceCoordinator {
         if (gbDevice.isConnected() || gbDevice.isConnecting()) {
             GBApplication.deviceService().disconnect();
         }
-        /*try (DBHandler dbHandler = GBApplication.acquireDB()) {
-            DaoSession session = dbHandler.getDaoSession();
-            Device device = DBHelper.findDevice(gbDevice, session);
-            if (device != null) {
-                deleteDevice(gbDevice, device, session);
-                QueryBuilder<?> qb = session.getDeviceAttributesDao().queryBuilder();
-                qb.where(DeviceAttributesDao.Properties.DeviceId.eq(device.getId())).buildDelete().executeDeleteWithoutDetachingEntities();
-                session.getDeviceDao().delete(device);
-            } else {
-              //  LOG.info("device to delete not found in db: " + gbDevice);
-            }
-        } catch (Exception e) {
-            throw new Exception("Error deleting device: " + e.getMessage(), e);
-        }*/
     }
 }

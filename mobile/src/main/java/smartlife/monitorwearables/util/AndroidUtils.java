@@ -72,14 +72,6 @@ public class AndroidUtils {
         }
     }
 
-    public static void setLanguage(Activity activity, Locale language) {
-        Configuration config = new Configuration();
-        config.setLocale(language);
-
-        // FIXME: I have no idea what I am doing
-        activity.getBaseContext().getResources().updateConfiguration(config, activity.getBaseContext().getResources().getDisplayMetrics());
-        activity.recreate();
-    }
 
     public static String getDateTime() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());

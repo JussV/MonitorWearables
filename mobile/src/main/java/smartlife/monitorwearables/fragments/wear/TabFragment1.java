@@ -1,4 +1,4 @@
-package smartlife.monitorwearables.fragments;
+package smartlife.monitorwearables.fragments.wear;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,17 +19,11 @@ import smartlife.monitorwearables.adapter.HeartRateAdapter;
 import smartlife.monitorwearables.db.HRMonitorContract;
 import smartlife.monitorwearables.db.HRMonitorDbHelper;
 import smartlife.monitorwearables.entities.HeartRate;
-
-/**
- * Created by Joana on 8/15/2017.
- */
+import smartlife.monitorwearables.model.DeviceType;
 
 public class TabFragment1 extends Fragment {
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     List<HeartRate> heartRateArray;
-    private HRMonitorDbHelper mDbHelper;
+    private int deviceTypeKey;
 
     String[] projection = {
             HRMonitorContract.HeartRate._ID,
@@ -40,6 +33,8 @@ public class TabFragment1 extends Fragment {
     String sortOrder =
             HRMonitorContract.HeartRate.COLUMN_CREATED_AT + " DESC";
 
+    String selection = HRMonitorContract.HeartRate.COLUMN_DEVICE_TYPE_KEY  + "=?";
+    String[] selectionArgs = new String[1];
 
     public TabFragment1(){}
 
@@ -56,20 +51,24 @@ public class TabFragment1 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-       // super.onCreate(savedInstanceState);
-        View rootView = inflater.inflate( R.layout.tab_1, container, false);
+        View rootView = inflater.inflate( R.layout.tab_1, container, false); Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            selectionArgs[0] = String.valueOf(bundle.getInt("device", DeviceType.UNKNOWN.getKey()));
+        } else {
+            selectionArgs = null;
+        }
 
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv_heart_rates);
-        mDbHelper = new HRMonitorDbHelper(getContext());
+        RecyclerView mRecyclerView = rootView.findViewById(R.id.rv_heart_rates);
+        HRMonitorDbHelper mDbHelper = new HRMonitorDbHelper(getContext());
         heartRateArray = new ArrayList<HeartRate>();
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cursor = db.query(
-                HRMonitorContract.HeartRate.TABLE_NAME,                     // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
+                HRMonitorContract.HeartRate.TABLE_NAME,         // The table to query
+                projection,                                    // The columns to return
+                selection,                                    // The columns for the WHERE clause
+                selectionArgs,                               // The values for the WHERE clause
+                null,                               // don't group the rows
+                null,                               // don't filter by row groups
                 sortOrder                                 // The sort order
         );
 
@@ -82,10 +81,10 @@ public class TabFragment1 extends Fragment {
             heartRateArray.add(heartRateItem);
         }
         cursor.close();
-
-        mAdapter = new HeartRateAdapter(heartRateArray);
+        db.close();
+        RecyclerView.Adapter mAdapter = new HeartRateAdapter(heartRateArray);
         mRecyclerView.setAdapter(mAdapter);
-        mLayoutManager = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
         return rootView;
     }

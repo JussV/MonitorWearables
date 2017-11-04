@@ -55,16 +55,6 @@ public abstract class AbstractDeviceCoordinator implements DeviceCoordinator {
         return false;
     }
 
-
-    /**
-     * Hook for subclasses to perform device-specific deletion logic, e.g. db cleanup.
-     * @param gbDevice the GBDevice
-     * @param device the corresponding database Device
-     * @param session the session to use
-     * @throws Exception
-     */
-    protected abstract void deleteDevice(@NonNull GBDevice gbDevice, @NonNull Device device, @NonNull DaoSession session) throws Exception;
-
     @Override
     public boolean supports(GBDevice device) {
         return getDeviceType().equals(device.getType());

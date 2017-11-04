@@ -1,4 +1,4 @@
-package smartlife.monitorwearables.fragments;
+package smartlife.monitorwearables.fragments.miband;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;

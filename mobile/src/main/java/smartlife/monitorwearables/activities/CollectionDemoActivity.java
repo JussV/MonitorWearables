@@ -17,25 +17,20 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.underscore.$;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.ScheduledExecutorService;
 
 import smartlife.monitorwearables.Constants;
 import smartlife.monitorwearables.R;
@@ -44,18 +39,15 @@ import smartlife.monitorwearables.db.HRMonitorContract;
 import smartlife.monitorwearables.db.HRMonitorLocalDBOperations;
 import smartlife.monitorwearables.entities.Device;
 import smartlife.monitorwearables.entities.HeartRate;
-import smartlife.monitorwearables.fragments.TabFragment1;
-import smartlife.monitorwearables.fragments.TabFragment2;
-import smartlife.monitorwearables.fragments.TabFragment3;
+import smartlife.monitorwearables.fragments.miband.TabFragment1;
+import smartlife.monitorwearables.fragments.miband.TabFragment2;
+import smartlife.monitorwearables.fragments.miband.TabFragment3;
 import smartlife.monitorwearables.model.DeviceType;
 import smartlife.monitorwearables.service.HeartRateService;
 import smartlife.monitorwearables.service.volley.VolleyCallback;
 import smartlife.monitorwearables.service.volley.VolleyOperations;
 import smartlife.monitorwearables.util.AndroidUtils;
 
-/**
- * Created by Joana on 8/15/2017.
- */
 
 public class CollectionDemoActivity extends GBActivity {
     public final static int TAB_LIST_HR = 0;
@@ -63,7 +55,6 @@ public class CollectionDemoActivity extends GBActivity {
 
     private ViewPager viewPager;
     private List<Fragment> fragments = new Vector<Fragment>();
-    private ScheduledExecutorService scheduledExecutorService;
     private static SharedPreferences sharedPrefs;
     private ImageView syncHR;
     private CoordinatorLayout coordinatorLayout;
@@ -74,6 +65,8 @@ public class CollectionDemoActivity extends GBActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Intent intent = getIntent();
+        final Integer deviceType = (Integer)intent.getExtras().get(Constants.DEVICE_TYPE);
 
         this.setTitle("Heart rate");
         setContentView(R.layout.activity_collection_demo);
@@ -102,13 +95,31 @@ public class CollectionDemoActivity extends GBActivity {
         tabLayout.getTabAt(TAB_LIVE_HR).setCustomView(secondTab);
 
         Bundle page = new Bundle();
-        fragments.add(Fragment.instantiate(this, TabFragment1.class.getName(), page));
-        fragments.add(Fragment.instantiate(this, TabFragment2.class.getName(), page));
-        fragments.add(Fragment.instantiate(this, TabFragment3.class.getName(), page));
+        Bundle bundle = new Bundle();
+        bundle.putInt("device", deviceType);
+        if(deviceType == DeviceType.MIBAND2.getKey()){
+            Fragment tab1 = Fragment.instantiate(this, TabFragment1.class.getName(), page);
+            tab1.setArguments(bundle);
+            Fragment tab2 = Fragment.instantiate(this, TabFragment2.class.getName(), page);
+            tab2.setArguments(bundle);
+            Fragment tab3 = Fragment.instantiate(this, TabFragment3.class.getName(), page);
+            tab3.setArguments(bundle);
+            fragments.add(tab1);
+            fragments.add(tab2);
+            fragments.add(tab3);
+        } else if(deviceType == DeviceType.ANDROIDWEAR_MOTO360SPORT.getKey()){
+            Fragment tab1 = Fragment.instantiate(this, smartlife.monitorwearables.fragments.wear.TabFragment1.class.getName(), page);
+            tab1.setArguments(bundle);
+            Fragment tab2 = Fragment.instantiate(this, smartlife.monitorwearables.fragments.wear.TabFragment2.class.getName(), page);
+            tab2.setArguments(bundle);
+            Fragment tab3 = Fragment.instantiate(this, smartlife.monitorwearables.fragments.wear.TabFragment3.class.getName(), page);
+            tab3.setArguments(bundle);
+            fragments.add(tab1);
+            fragments.add(tab2);
+            fragments.add(tab3);
+        }
 
-     //   tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-
-        viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager = findViewById(R.id.pager);
 
         final PagerAdapter adapter = new DemoCollectionPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), fragments);
         viewPager.setAdapter(adapter);
@@ -132,7 +143,7 @@ public class CollectionDemoActivity extends GBActivity {
             }
         });
 
-        syncHR = (ImageView) findViewById(R.id.iv_sync_hr);
+        syncHR = findViewById(R.id.iv_sync_hr);
         syncHR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,7 +154,7 @@ public class CollectionDemoActivity extends GBActivity {
                // TelephonyManager tMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
                 final String uniquePhoneId = Device.getDeviceUniqueId(getApplicationContext());
 
-                VolleyOperations.getLastSyncDate(uniquePhoneId, getApplicationContext(), new VolleyCallback(){
+                VolleyOperations.getLastSyncDateByDeviceType(uniquePhoneId, deviceType, getApplicationContext(), new VolleyCallback(){
                     @Override
                     public void onSuccess(JSONObject result) throws JSONException {
                         if(result!=null && result.get("date") != null){
@@ -161,8 +172,7 @@ public class CollectionDemoActivity extends GBActivity {
                                     hrObj.put(Constants.HR_COLUMN_DATE, heartRate.getCreatedAt());
                                     hrObj.put(Constants.HR_COLUMN_VALUE, heartRate.getValue());
                                     hrObj.put(Constants.HR_COLUMN_UPID, uniquePhoneId);
-                                    // TODO: deviceType should be taken from the device
-                                    hrObj.put(Constants.HR_COLUMN_DEVICE, DeviceType.MIBAND2.getKey());
+                                    hrObj.put(Constants.HR_COLUMN_DEVICE, deviceType);
                                     mJSONArray.put(hrObj);
                                 }catch (JSONException ex){
                                     ex.printStackTrace();
@@ -196,8 +206,7 @@ public class CollectionDemoActivity extends GBActivity {
                                 hrObj.put(Constants.HR_COLUMN_DATE, heartRate.getCreatedAt());
                                 hrObj.put(Constants.HR_COLUMN_VALUE, heartRate.getValue());
                                 hrObj.put(Constants.HR_COLUMN_UPID, uniquePhoneId);
-                                // TODO: deviceType should be taken from the device
-                                hrObj.put(Constants.HR_COLUMN_DEVICE, DeviceType.MIBAND2.getKey());
+                                hrObj.put(Constants.HR_COLUMN_DEVICE, deviceType);
                                 mJSONArray.put(hrObj);
                             }catch (JSONException ex){
                                 ex.printStackTrace();
@@ -250,7 +259,6 @@ public class CollectionDemoActivity extends GBActivity {
             FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();
 
             if(currentFragment instanceof TabFragment1){
-              //  ((TabFragment1) currentFragment).getAdapter().notifyDataSetChanged();
                 TabFragment1 fragment1 = (TabFragment1) ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(TAB_LIST_HR);
                 fragmentTransaction
                         .detach(currentFragment)
@@ -283,8 +291,7 @@ public class CollectionDemoActivity extends GBActivity {
     }
 
     private Fragment getCurrentFragment() {
-        Fragment fragment = (Fragment) ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(viewPager.getCurrentItem());
-        return fragment;
+        return ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(viewPager.getCurrentItem());
     }
 
 

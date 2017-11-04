@@ -1,7 +1,6 @@
 package smartlife.monitorwearables;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -9,26 +8,27 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.felkertech.settingsmanager.SettingsManager;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by uwe on 01.04.15.
- */
 public class HeartbeatService extends Service implements SensorEventListener {
 
     private SensorManager mSensorManager;
@@ -42,6 +42,7 @@ public class HeartbeatService extends Service implements SensorEventListener {
     SharedPreferences prefs;
     String[] monitorIntervals;
     private Sensor mHeartRateSensor;
+    private SettingsManager mSettingsManager;
 
     // interface to pass a heartbeat value to the implementing class
     public interface OnChangeListener {
@@ -69,13 +70,18 @@ public class HeartbeatService extends Service implements SensorEventListener {
     public void onCreate() {
         super.onCreate();
         handler = new Handler();
+        mSettingsManager = new SettingsManager(this);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         monitorIntervals = getResources().getStringArray(R.array.hr_interval_array);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+        //batching is not supported for Moto 360 Sport, because this fifoSize value is 0.
+        int fifoSize = mHeartRateSensor.getFifoReservedEventCount();
+        int fifoMax = mHeartRateSensor.getFifoMaxEventCount();
         // delay SENSOR_DELAY_UI is sufficient
-        if(prefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false)){
-            boolean res = mSensorManager.registerListener(this, mHeartRateSensor,  SensorManager.SENSOR_DELAY_UI);
+       // if(prefs.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring), false)){
+        if(mSettingsManager.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring), false)){
+            boolean res = mSensorManager.registerListener(this, mHeartRateSensor,  600000000);
             Log.d(TAG_HEART_BEAT, " sensor registered: " + (res ? "yes" : "no"));
             mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
             mGoogleApiClient.connect();
@@ -88,7 +94,7 @@ public class HeartbeatService extends Service implements SensorEventListener {
     }
 
     public void registerListener(){
-        mSensorManager.registerListener(this, mHeartRateSensor,  SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, mHeartRateSensor,  600000000);
         mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
         mGoogleApiClient.connect();
     }
@@ -110,7 +116,7 @@ public class HeartbeatService extends Service implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if(!prefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false)){
+        if(!prefs.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring), false)){
             unregisterListener();
         } else {
             // is this a heartbeat event and does it have data?
@@ -133,39 +139,37 @@ public class HeartbeatService extends Service implements SensorEventListener {
         }
     }
 
-
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
-    }
-
-
-    /**
-     * sends a string message to the connected handheld using the google api client (if available)
-     * @param message
-     */
     private void sendMessageToHandheld(final String message) {
-
         if (mGoogleApiClient == null)
             return;
 
-        Log.d(TAG_HEART_BEAT,"sending a message to handheld: "+message);
-
-        // use the api client to send the heartbeat value to our handheld
+        // use the api client to send the heartbeat value to the handheld
         final PendingResult<NodeApi.GetConnectedNodesResult> nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient);
         nodes.setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
-            public void onResult(NodeApi.GetConnectedNodesResult result) {
+            public void onResult(@NonNull NodeApi.GetConnectedNodesResult result) {
                 final List<Node> nodes = result.getNodes();
-                if (nodes != null) {
-                    for (int i=0; i<nodes.size(); i++) {
-                        final Node node = nodes.get(i);
-                        Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), message, null);
-                    }
+                final String path = "/wear/heartRate";
+
+                for (Node node : nodes) {
+                    Log.d(TAG_HEART_BEAT, "Send message to handheld: " + message);
+                    ArrayList<DataMap> messagesToHandheld = new ArrayList<>();
+                    DataMap hrMessage = new DataMap();
+                    hrMessage.putString("heartRate", message);
+                    messagesToHandheld.add(hrMessage);
+                    DataMap wearModel = new DataMap();
+                    wearModel.putString("wearModel", Build.MODEL);
+                    messagesToHandheld.add(wearModel);
+                    DataMap dm = new DataMap();
+                    dm.putDataMapArrayList("key", messagesToHandheld);
+                    Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, dm.toByteArray());
                 }
             }
         });
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
 
     }
 }

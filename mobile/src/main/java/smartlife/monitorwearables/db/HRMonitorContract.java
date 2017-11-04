@@ -2,10 +2,6 @@ package smartlife.monitorwearables.db;
 
 import android.provider.BaseColumns;
 
-/**
- * Created by Joana on 9/24/2017.
- */
-
 public class HRMonitorContract {
 
     // To prevent someone from accidentally instantiating the contract class,
@@ -23,6 +19,7 @@ public class HRMonitorContract {
         public static final String TABLE_NAME = "heartRate";
         public static final String COLUMN_CREATED_AT = "createdAt";
         public static final String COLUMN_VALUE = "value";
+        public static final String COLUMN_DEVICE_TYPE_KEY = "deviceKey";
     }
 
 }

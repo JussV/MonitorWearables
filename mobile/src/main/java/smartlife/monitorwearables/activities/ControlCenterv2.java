@@ -24,6 +24,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,22 +49,33 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.CapabilityApi;
+import com.google.android.gms.wearable.CapabilityInfo;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.Wearable;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import smartlife.monitorwearables.GBApplication;
 import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.adapter.DeviceRecyclerViewAdapter;
 import smartlife.monitorwearables.devices.DeviceManager;
 import smartlife.monitorwearables.devices.wear.DataLayerListenerService;
 import smartlife.monitorwearables.impl.GBDevice;
+import smartlife.monitorwearables.model.DeviceType;
+import smartlife.monitorwearables.service.volley.VolleyOperations;
 import smartlife.monitorwearables.util.GB;
 import smartlife.monitorwearables.util.Prefs;
-import smartlife.monitorwearables.GBApplication;
 
+public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.CapabilityListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, NavigationView.OnNavigationItemSelectedListener {
 
-//TODO: extend GBActivity, but it requires actionbar that is not available
-public class ControlCenterv2 extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+    private String TAG = "ControlCenterv2";
 
     //needed for KK compatibility
     static {
@@ -74,11 +87,14 @@ public class ControlCenterv2 extends AppCompatActivity
     private List<GBDevice> deviceList;
     private DeviceRecyclerViewAdapter mGBDeviceAdapter;
     private RecyclerView deviceListView;
+    private GoogleApiClient mGoogleApiClient;
+    Set<Node> nodeList = null;
+    private WifiManager wifiManager;
+    WifiInfo wifiInfo;
 
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            // message from API client! message from wear! The contents is the heartbeat.
             Log.d("Wear Message: ", msg.toString());
         }
     };
@@ -105,10 +121,10 @@ public class ControlCenterv2 extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controlcenterv2);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,24 +132,30 @@ public class ControlCenterv2 extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.controlcenter_navigation_drawer_open, R.string.controlcenter_navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         //end of material design boilerplate
         deviceManager = ((GBApplication) getApplication()).getDeviceManager();
-
-        deviceListView = (RecyclerView) findViewById(R.id.deviceListView);
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiInfo = wifiManager.getConnectionInfo();
+        deviceListView = findViewById(R.id.deviceListView);
         deviceListView.setHasFixedSize(true);
         deviceListView.setLayoutManager(new LinearLayoutManager(this));
-        background = (ImageView) findViewById(R.id.no_items_bg);
+        background = findViewById(R.id.no_items_bg);
 
         deviceList = deviceManager.getDevices();
+        //Android Wear devices are discovered by using Wearable API
+        buildGoogleApiClient();
+        mGoogleApiClient.connect();
+        getConnectedNodes();
+
         mGBDeviceAdapter = new DeviceRecyclerViewAdapter(this, deviceList);
 
         deviceListView.setAdapter(this.mGBDeviceAdapter);
@@ -169,6 +191,14 @@ public class ControlCenterv2 extends AppCompatActivity
         }
     }
 
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -192,7 +222,7 @@ public class ControlCenterv2 extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -203,29 +233,14 @@ public class ControlCenterv2 extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
 
         switch (item.getItemId()) {
-           /* case R.id.action_settings:
-                Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                return true;*/
             case R.id.action_debug:
                 Intent debugIntent = new Intent(this, DebugActivity.class);
                 startActivity(debugIntent);
                 return true;
-         /*   case R.id.action_db_management:
-                Intent dbIntent = new Intent(this, DbManagementActivity.class);
-                startActivity(dbIntent);
-                return true;
-            case R.id.action_quit:
-                GBApplication.quit();
-                return true;
-            case R.id.external_changelog:
-                ChangeLog cl = new ChangeLog(this);
-                cl.getFullLogDialog().show();
-                return true;*/
         }
 
         return true;
@@ -265,4 +280,83 @@ public class ControlCenterv2 extends AppCompatActivity
             ActivityCompat.requestPermissions(this, wantedPermissions.toArray(new String[wantedPermissions.size()]), 0);
     }
 
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d(TAG, "onConnectionSuspended(): Connection to Google API client was suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.e(TAG, "onConnectionFailed(): Failed to connect, with result: " + connectionResult);
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d(TAG, "onConnected(): Successfully connected to Google API client");
+        Wearable.CapabilityApi.addCapabilityListener(mGoogleApiClient, this, "verify_remote_wear_app");
+    }
+
+    public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
+        Set<Node> connectedNodes = capabilityInfo.getNodes();
+        Node connectedNode = pickBestNode(connectedNodes);
+        if(connectedNode != null){
+            Log.d(TAG, "Wear Connected");
+            for(GBDevice device: deviceList) {
+                if (device.getType() == DeviceType.ANDROIDWEAR_MOTO360SPORT && connectedNode.getDisplayName().equals(device.getName())) {
+                    device.setState(GBDevice.State.INITIALIZED);
+                }
+            }
+        }else{
+            Log.d(TAG, "Wear not connected");
+            for(GBDevice device: deviceList) {
+                if (device.getType() == DeviceType.ANDROIDWEAR_MOTO360SPORT) {
+                    device.setState(GBDevice.State.NOT_CONNECTED);
+                }
+            }
+        }
+    }
+
+    private Node pickBestNode(Set<Node> nodes) {
+        Node bestNode = null;
+        // Find a nearby node or pick one arbitrarily
+        for (Node node : nodes) {
+            if (node.isNearby()) {
+                return node;
+            }
+            bestNode = node;
+        }
+        return bestNode;
+    }
+
+    /**
+     * <p>
+     * Not always Android Wear devices are returned as bonded devices.
+     * <p>
+     * Therefore we check if there are any other nodes connected and add them to deviceList.
+     *
+     */
+    private void getConnectedNodes(){
+        PendingResult<CapabilityApi.GetCapabilityResult> pendingResult = Wearable.CapabilityApi.getCapability(mGoogleApiClient, "verify_remote_wear_app", CapabilityApi.FILTER_REACHABLE);
+        pendingResult.setResultCallback(new ResultCallback<CapabilityApi.GetCapabilityResult>() {
+            @Override
+            public void onResult(@NonNull CapabilityApi.GetCapabilityResult nodes) {
+                nodeList = nodes.getCapability().getNodes();
+                for(Node node: nodeList){
+                    for(GBDevice device: deviceList){
+                        if(!device.getName().equals(node.getDisplayName()) && device.getType()==DeviceType.ANDROIDWEAR_MOTO360SPORT){
+                            GBDevice wearDevice = new GBDevice("", node.getDisplayName(), DeviceType.ANDROIDWEAR_MOTO360SPORT);
+                            deviceList.add(wearDevice);
+                        }
+                        if(device.getType()==DeviceType.ANDROIDWEAR_MOTO360SPORT && device.getName().equals(node.getDisplayName())){
+                            device.setState(GBDevice.State.INITIALIZED);
+                            // Store connected device in remote db
+                            VolleyOperations.storeDeviceToRemoteDB(device, getApplicationContext());
+                        }
+                    }
+                }
+            }
+        }
+        );
+
+    }
 }

@@ -1,23 +1,13 @@
 package smartlife.monitorwearables.service;
 
-import android.app.IntentService;
-import android.app.Service;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.IBinder;
-import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import smartlife.monitorwearables.GBApplication;
-import smartlife.monitorwearables.fragments.TabFragment3;
-import smartlife.monitorwearables.util.Prefs;
 
 /**
  * Created by Joana on 9/12/2017.

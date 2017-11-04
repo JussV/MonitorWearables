@@ -9,19 +9,15 @@ import java.util.Date;
 
 import smartlife.monitorwearables.entities.HeartRate;
 
-/**
- * Created by Joana on 9/29/2017.
- */
-
 public class HRMonitorLocalDBOperations {
     private static HRMonitorDbHelper mDbHelper;
-    public final static long DAY_IN_MS = 1000 * 60 * 60 * 24;
+    private final static long DAY_IN_MS = 1000 * 60 * 60 * 24;
 
-    static SQLiteDatabase db;
+    private static SQLiteDatabase db;
 
     public static ArrayList<HeartRate> selectHeartRates(Context cxt, String selection, String[] selectionArgs, String sortOrder){
         mDbHelper = new HRMonitorDbHelper(cxt);
-        db = mDbHelper.getReadableDatabase();;
+        db = mDbHelper.getReadableDatabase();
         ArrayList<HeartRate> heartRateArray = new ArrayList<HeartRate>();
 
         Cursor cursor = db.query(
@@ -42,7 +38,7 @@ public class HRMonitorLocalDBOperations {
             heartRateArray.add(heartRateItem);
         }
         cursor.close();
-
+        db.close();
         return heartRateArray;
     }
 
@@ -50,7 +46,7 @@ public class HRMonitorLocalDBOperations {
         long twoDaysAgo = new Date().getTime() - 2 * DAY_IN_MS;
 
         mDbHelper = new HRMonitorDbHelper(cxt);
-        db = mDbHelper.getReadableDatabase();;
+        db = mDbHelper.getReadableDatabase();
         int rowsDeleted = db.delete(HRMonitorContract.HeartRate.TABLE_NAME, HRMonitorContract.HeartRate.COLUMN_CREATED_AT + "<= ?", new String[]{ String.valueOf(twoDaysAgo) } );
         db.close();
         return rowsDeleted;

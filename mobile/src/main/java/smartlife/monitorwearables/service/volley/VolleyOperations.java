@@ -7,13 +7,13 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
-import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONArray;
@@ -21,24 +21,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.List;
 
 import smartlife.monitorwearables.Constants;
-import smartlife.monitorwearables.entities.HeartRate;
+import smartlife.monitorwearables.impl.GBDevice;
 
-/**
- * Created by Joana on 9/28/2017.
- */
 
 public class VolleyOperations {
 
     public static final int STATUS_CODE_404 = 404;
 
-    public static void getLastSyncDate(String uniquesPhoneId, final Context context, final VolleyCallback callback){
+    public static void getLastSyncDateByDeviceType(String uniquesPhoneId, int deviceTypeKey, final Context context, final VolleyCallback callback){
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, Constants.URL.concat(Constants.HEART_RATE_API).concat(Constants.LATEST_SYNC_DATE).concat("?upid=" + uniquesPhoneId), null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, Constants.URL.concat(Constants.HEART_RATE_API).concat(Constants.LATEST_SYNC_DATE).concat("?upid=" + uniquesPhoneId + "&device=" + deviceTypeKey), null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -123,5 +119,61 @@ public class VolleyOperations {
                 message = "Connection TimeOut! Please check your internet connection.";
             }
             return message;
+    }
+
+    public static void addDeviceToRemoteDb(JSONObject device, Context context){
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.POST, Constants.URL.concat(Constants.DEVICE_API), device, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        int i = 0;
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                });
+        VolleySingleton.getInstance(context).addToRequestQueue(jsObjRequest);
+    }
+
+    public static void storeDeviceToRemoteDB(final GBDevice device, final Context context){
+        JsonArrayRequest jsArrRequest = new JsonArrayRequest
+                (Request.Method.GET, Constants.URL.concat(Constants.DEVICE_API), null, new Response.Listener<JSONArray>() {
+
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        // if gbDevice's key is not in remote db add it
+                        List<Integer> remoteDeviceKeys = new ArrayList<Integer>();
+                        for (int i = 0; i < response.length() ; i++) {
+                            try {
+                                JSONObject mJsonObject = (JSONObject)response.get(i);
+                                remoteDeviceKeys.add((Integer)mJsonObject.get(Constants.DEVICE_KEY));
+                            } catch (JSONException ex){
+                                ex.printStackTrace();
+                            }
+                        }
+                        if(remoteDeviceKeys.size() == 0 || !remoteDeviceKeys.contains(device.getType().getKey())){
+                            JSONObject deviceToStore = new JSONObject();
+                            try {
+                                deviceToStore.put(Constants.DEVICE_KEY, device.getType().getKey());
+                                deviceToStore.put(Constants.DEVICE_NAME, device.getName());
+                                VolleyOperations.addDeviceToRemoteDb(deviceToStore, context);
+                            } catch (JSONException ex){
+                                ex.printStackTrace();
+                            }
+
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                });
+        VolleySingleton.getInstance(context).addToRequestQueue(jsArrRequest);
     }
 }
