@@ -163,8 +163,8 @@ public class CollectionDemoActivity extends GBActivity {
                             lastSyncDate = lastSyncDate.replace(lastSyncDate.subSequence(lastSyncDate.length()-4, lastSyncDate.length()-1), "999");
                             final Date lastSynchronizationDate = new Date(AndroidUtils.parseMongoDateToLocal(lastSyncDate));
                             // heart rate measurements exist for the specified date
-                            ArrayList<HeartRate> heartRateListByLastSyncDate = HRMonitorLocalDBOperations.selectHeartRates(getApplicationContext(),
-                                    HRMonitorContract.HeartRate.COLUMN_CREATED_AT + " > ? ",  new String[] { String.valueOf(AndroidUtils.parseMongoDateToLocal(lastSyncDate)) }, "createdAt ASC");
+                            ArrayList<HeartRate> heartRateListByLastSyncDate = HRMonitorLocalDBOperations.selectHeartRatesByDateAndDevice(getApplicationContext(),
+                                    HRMonitorContract.HeartRate.COLUMN_CREATED_AT + " > ? AND " + HRMonitorContract.HeartRate.COLUMN_DEVICE_TYPE_KEY + "=?",  new String[] { String.valueOf(AndroidUtils.parseMongoDateToLocal(lastSyncDate)), String.valueOf(deviceType) }, "createdAt ASC");
                             JSONArray mJSONArray = new JSONArray();
                             for (HeartRate heartRate : heartRateListByLastSyncDate) {
                                 JSONObject hrObj = new JSONObject();
@@ -198,7 +198,7 @@ public class CollectionDemoActivity extends GBActivity {
                     @Override
                     public void onFailure(){
                         // no heart rate measurements exist for the specific uniquePhoneId
-                        ArrayList<HeartRate> heartRateList = HRMonitorLocalDBOperations.selectHeartRates(getApplicationContext(), null, null, "createdAt ASC");
+                        ArrayList<HeartRate> heartRateList = HRMonitorLocalDBOperations.selectHeartRatesByDateAndDevice(getApplicationContext(), HRMonitorContract.HeartRate.COLUMN_DEVICE_TYPE_KEY + "=?", new String[]{ String.valueOf(deviceType) }, "createdAt ASC");
                         JSONArray mJSONArray = new JSONArray();
                         for (HeartRate heartRate : heartRateList) {
                             JSONObject hrObj = new JSONObject();
