@@ -18,9 +18,6 @@ import com.google.android.gms.wearable.Wearable;
 import smartlife.monitorwearables.R;
 
 
-/**
- * Created by Joana on 10/29/2017.
- */
 public class TabFragment3 extends Fragment {
 
     private Switch hrMonitorSwitch;

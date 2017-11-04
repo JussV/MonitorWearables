@@ -18,39 +18,23 @@ package smartlife.monitorwearables.devices.wear;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanFilter;
 import android.os.Build;
-import android.os.ParcelUuid;
 import android.support.annotation.NonNull;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.wearable.NodeApi;
-import com.google.android.gms.wearable.Wearable;
-
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import smartlife.monitorwearables.GBApplication;
-import smartlife.monitorwearables.devices.miband.MiBand2Service;
-import smartlife.monitorwearables.devices.miband.MiBandConst;
-import smartlife.monitorwearables.devices.miband.MiBandCoordinator;
-import smartlife.monitorwearables.devices.miband.MiBandPairingActivity;
-import smartlife.monitorwearables.devices.miband.MiBandService;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.impl.GBDeviceCandidate;
 import smartlife.monitorwearables.model.DeviceType;
 import smartlife.monitorwearables.service.AbstractDeviceCoordinator;
-import smartlife.monitorwearables.util.Prefs;
 
 public class AndroidWearCoordinator extends AbstractDeviceCoordinator {
 
     @Override
     public DeviceType getDeviceType() {
-        return DeviceType.ANDROIDWEAR;
+        return DeviceType.ANDROIDWEAR_MOTO360SPORT;
     }
 
     @NonNull
@@ -93,7 +77,7 @@ public class AndroidWearCoordinator extends AbstractDeviceCoordinator {
     @NonNull
     @Override
     public DeviceType getSupportedType(GBDeviceCandidate candidate) {
-            return DeviceType.ANDROIDWEAR;
+            return DeviceType.ANDROIDWEAR_MOTO360SPORT;
     }
 
     @Override

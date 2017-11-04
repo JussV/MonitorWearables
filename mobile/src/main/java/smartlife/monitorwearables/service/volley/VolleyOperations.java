@@ -7,7 +7,6 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
-import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
@@ -22,26 +21,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import smartlife.monitorwearables.Constants;
-import smartlife.monitorwearables.entities.HeartRate;
 import smartlife.monitorwearables.impl.GBDevice;
 
-/**
- * Created by Joana on 9/28/2017.
- */
 
 public class VolleyOperations {
 
     public static final int STATUS_CODE_404 = 404;
 
-    public static void getLastSyncDate(String uniquesPhoneId, final Context context, final VolleyCallback callback){
+    public static void getLastSyncDateByDeviceType(String uniquesPhoneId, int deviceTypeKey, final Context context, final VolleyCallback callback){
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, Constants.URL.concat(Constants.HEART_RATE_API).concat(Constants.LATEST_SYNC_DATE).concat("?upid=" + uniquesPhoneId), null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, Constants.URL.concat(Constants.HEART_RATE_API).concat(Constants.LATEST_SYNC_DATE).concat("?upid=" + uniquesPhoneId + "&device=" + deviceTypeKey), null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {

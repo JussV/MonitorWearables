@@ -6,15 +6,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import smartlife.monitorwearables.db.HRMonitorContract.Device;
 import smartlife.monitorwearables.db.HRMonitorContract.HeartRate;
 
-/**
- * Created by Joana on 9/24/2017.
- */
-
 public class HRMonitorDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 2;
-    public static final String DATABASE_NAME = "hrMonitor.db";
+    private static final int DATABASE_VERSION = 3;
+    private static final String DATABASE_NAME = "hrMonitor.db";
 
     private static final String TEXT_TYPE = " TEXT";
     private static final String INT_TYPE = " INTEGER";
@@ -52,6 +48,7 @@ public class HRMonitorDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + HeartRate.TABLE_NAME + " (" +
                     HeartRate._ID +  INT_TYPE + " PRIMARY KEY AUTOINCREMENT" + COMMA_SEP +
                     HeartRate.COLUMN_CREATED_AT + DATETIME_TYPE + COMMA_SEP +
+                    HeartRate.COLUMN_DEVICE_TYPE_KEY + INT_TYPE + COMMA_SEP +
                     HeartRate.COLUMN_VALUE + INT_TYPE + " )";
 
     private static final String SQL_DELETE_HR_ENTRIES =

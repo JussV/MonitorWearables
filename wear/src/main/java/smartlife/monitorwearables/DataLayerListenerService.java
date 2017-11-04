@@ -1,12 +1,7 @@
 package smartlife.monitorwearables;
 
-import android.app.Service;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -26,9 +21,6 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by Joana on 10/20/2017.
- */
 
 public class DataLayerListenerService extends WearableListenerService {
 

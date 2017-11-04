@@ -9,10 +9,6 @@ import java.util.Date;
 
 import smartlife.monitorwearables.entities.HeartRate;
 
-/**
- * Created by Joana on 9/29/2017.
- */
-
 public class HRMonitorLocalDBOperations {
     private static HRMonitorDbHelper mDbHelper;
     private final static long DAY_IN_MS = 1000 * 60 * 60 * 24;

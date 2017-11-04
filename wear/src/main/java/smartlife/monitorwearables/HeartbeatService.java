@@ -1,7 +1,6 @@
 package smartlife.monitorwearables;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -9,6 +8,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -20,18 +20,15 @@ import com.felkertech.settingsmanager.SettingsManager;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by uwe on 01.04.15.
- */
 public class HeartbeatService extends Service implements SensorEventListener {
 
     private SensorManager mSensorManager;
@@ -143,11 +140,10 @@ public class HeartbeatService extends Service implements SensorEventListener {
     }
 
     private void sendMessageToHandheld(final String message) {
-
         if (mGoogleApiClient == null)
             return;
 
-        // use the api client to send the heartbeat value to our handheld
+        // use the api client to send the heartbeat value to the handheld
         final PendingResult<NodeApi.GetConnectedNodesResult> nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient);
         nodes.setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
@@ -157,9 +153,16 @@ public class HeartbeatService extends Service implements SensorEventListener {
 
                 for (Node node : nodes) {
                     Log.d(TAG_HEART_BEAT, "Send message to handheld: " + message);
-
-                    byte[] data = message.getBytes(StandardCharsets.UTF_8);
-                    Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, data);
+                    ArrayList<DataMap> messagesToHandheld = new ArrayList<>();
+                    DataMap hrMessage = new DataMap();
+                    hrMessage.putString("heartRate", message);
+                    messagesToHandheld.add(hrMessage);
+                    DataMap wearModel = new DataMap();
+                    wearModel.putString("wearModel", Build.MODEL);
+                    messagesToHandheld.add(wearModel);
+                    DataMap dm = new DataMap();
+                    dm.putDataMapArrayList("key", messagesToHandheld);
+                    Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, dm.toByteArray());
                 }
             }
         });
@@ -169,33 +172,4 @@ public class HeartbeatService extends Service implements SensorEventListener {
     public void onAccuracyChanged(Sensor sensor, int i) {
 
     }
-
-
-    /**
-     * sends a string message to the connected handheld using the google api client (if available)
-     * @param message
-     */
-   /* private void sendMessageToHandheld(final String message) {
-
-        if (mGoogleApiClient == null)
-            return;
-
-        Log.d(TAG_HEART_BEAT,"sending a message to handheld: "+message);
-
-        // use the api client to send the heartbeat value to our handheld
-        final PendingResult<NodeApi.GetConnectedNodesResult> nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient);
-        nodes.setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
-            @Override
-            public void onResult(NodeApi.GetConnectedNodesResult result) {
-                final List<Node> nodes = result.getNodes();
-                if (nodes != null) {
-                    for (int i=0; i<nodes.size(); i++) {
-                        final Node node = nodes.get(i);
-                        Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), message, null);
-                    }
-                }
-            }
-        });
-
-    }*/
 }

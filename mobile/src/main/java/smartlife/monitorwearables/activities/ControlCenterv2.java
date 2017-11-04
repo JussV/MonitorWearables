@@ -49,10 +49,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -62,15 +58,10 @@ import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import smartlife.monitorwearables.Constants;
 import smartlife.monitorwearables.GBApplication;
 import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.adapter.DeviceRecyclerViewAdapter;
@@ -79,7 +70,6 @@ import smartlife.monitorwearables.devices.wear.DataLayerListenerService;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.model.DeviceType;
 import smartlife.monitorwearables.service.volley.VolleyOperations;
-import smartlife.monitorwearables.service.volley.VolleySingleton;
 import smartlife.monitorwearables.util.GB;
 import smartlife.monitorwearables.util.Prefs;
 
@@ -312,14 +302,14 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
         if(connectedNode != null){
             Log.d(TAG, "Wear Connected");
             for(GBDevice device: deviceList) {
-                if (device.getType() == DeviceType.ANDROIDWEAR && connectedNode.getDisplayName().equals(device.getName())) {
+                if (device.getType() == DeviceType.ANDROIDWEAR_MOTO360SPORT && connectedNode.getDisplayName().equals(device.getName())) {
                     device.setState(GBDevice.State.INITIALIZED);
                 }
             }
         }else{
             Log.d(TAG, "Wear not connected");
             for(GBDevice device: deviceList) {
-                if (device.getType() == DeviceType.ANDROIDWEAR) {
+                if (device.getType() == DeviceType.ANDROIDWEAR_MOTO360SPORT) {
                     device.setState(GBDevice.State.NOT_CONNECTED);
                 }
             }
@@ -353,11 +343,11 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
                 nodeList = nodes.getCapability().getNodes();
                 for(Node node: nodeList){
                     for(GBDevice device: deviceList){
-                        if(!device.getName().equals(node.getDisplayName()) && device.getType()==DeviceType.ANDROIDWEAR){
-                            GBDevice wearDevice = new GBDevice("", node.getDisplayName(), DeviceType.ANDROIDWEAR);
+                        if(!device.getName().equals(node.getDisplayName()) && device.getType()==DeviceType.ANDROIDWEAR_MOTO360SPORT){
+                            GBDevice wearDevice = new GBDevice("", node.getDisplayName(), DeviceType.ANDROIDWEAR_MOTO360SPORT);
                             deviceList.add(wearDevice);
                         }
-                        if(device.getType()==DeviceType.ANDROIDWEAR && device.getName().equals(node.getDisplayName())){
+                        if(device.getType()==DeviceType.ANDROIDWEAR_MOTO360SPORT && device.getName().equals(node.getDisplayName())){
                             device.setState(GBDevice.State.INITIALIZED);
                             // Store connected device in remote db
                             VolleyOperations.storeDeviceToRemoteDB(device, getApplicationContext());

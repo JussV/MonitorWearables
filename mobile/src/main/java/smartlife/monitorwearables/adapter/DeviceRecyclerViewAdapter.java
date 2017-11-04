@@ -34,8 +34,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.felkertech.settingsmanager.SettingsManager;
-
 import java.util.List;
 
 import smartlife.monitorwearables.Constants;
@@ -130,7 +128,7 @@ public class DeviceRecyclerViewAdapter  extends RecyclerView.Adapter<DeviceRecyc
                 holder.deviceImageView.setImageResource(R.drawable.miband2_disabled);
         }
 
-        if (device.getType().getKey() == DeviceType.ANDROIDWEAR.getKey()) {
+        if (device.getType().getKey() == DeviceType.ANDROIDWEAR_MOTO360SPORT.getKey()) {
             if (device.isInitialized()) {
                 holder.deviceImageView.setImageResource(R.drawable.android_wear);
             }
