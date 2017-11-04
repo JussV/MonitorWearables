@@ -15,7 +15,7 @@ public class HRMonitorLocalDBOperations {
 
     private static SQLiteDatabase db;
 
-    public static ArrayList<HeartRate> selectHeartRates(Context cxt, String selection, String[] selectionArgs, String sortOrder){
+    public static ArrayList<HeartRate> selectHeartRatesByDateAndDevice(Context cxt, String selection, String[] selectionArgs, String sortOrder){
         mDbHelper = new HRMonitorDbHelper(cxt);
         db = mDbHelper.getReadableDatabase();
         ArrayList<HeartRate> heartRateArray = new ArrayList<HeartRate>();
