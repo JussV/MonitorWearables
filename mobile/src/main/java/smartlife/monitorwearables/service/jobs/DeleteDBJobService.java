@@ -36,10 +36,9 @@ public class DeleteDBJobService extends JobService {
 
     @Override
     public boolean onStartJob(final JobParameters job) {
-        mBackgroundTask = new AsyncTask() {
+         mBackgroundTask = new AsyncTask() {
             @Override
             protected Integer doInBackground(Object[] objects) {
-              //  return download_Image("https://s7d2.scene7.com/is/image/PetSmart/PB1201_STORY_CARO-Authority-HealthyOutside-DOG-20160818?$PB1201$");
                 final String uniquePhoneId = Device.getDeviceUniqueId(getApplicationContext());
                 //delete records by deviceType
                 int[] deviceTypeKeys = {DeviceType.MIBAND2.getKey(), DeviceType.ANDROIDWEAR_MOTO360SPORT.getKey()};
@@ -64,7 +63,7 @@ public class DeleteDBJobService extends JobService {
                                         hrObj.put(Constants.HR_COLUMN_VALUE, heartRate.getValue());
                                         hrObj.put(Constants.HR_COLUMN_UPID, uniquePhoneId);
                                         // TODO: deviceType should be taken from the device
-                                        hrObj.put(Constants.HR_COLUMN_DEVICE, DeviceType.MIBAND2.getKey());
+                                        hrObj.put(Constants.HR_COLUMN_DEVICE, deviceKey);
                                         mJSONArray.put(hrObj);
                                     }catch (JSONException ex){
                                         ex.printStackTrace();

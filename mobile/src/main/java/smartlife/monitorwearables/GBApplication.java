@@ -92,27 +92,12 @@ public class GBApplication extends Application {
         prefs = new Prefs(sharedPrefs);
         gbPrefs = new GBPrefs(prefs);
 
-        /*if (!GBEnvironment.isEnvironmentSetup()) {
-            GBEnvironment.setupEnvironment(GBEnvironment.createDeviceEnvironment());
-            // setup db after the environment is set up, but don't do it in test mode
-            // in test mode, it's done individually, see TestBase
-            setupDatabase();
-        }
-
-
-        if (getPrefsFileVersion() != CURRENT_PREFS_VERSION) {
-            migratePrefs(getPrefsFileVersion());
-        }
-*/
-
         deviceManager = new DeviceManager(this);
         deviceService = createDeviceService();
 
         Driver driver = new GooglePlayDriver(context);
         FirebaseJobDispatcher firebaseJobDispatcher = new FirebaseJobDispatcher(driver);
 
-       /* final int periodicity = (int) TimeUnit.HOURS.toSeconds(24); // Every 12 hours periodicity expressed as seconds
-        final int toleranceInterval = (int) TimeUnit.MINUTES.toSeconds(5); // a small(ish) window of time when triggering is OK*/
         Calendar now = Calendar.getInstance();
         Calendar midNight = Calendar.getInstance();
         midNight.setTimeInMillis(System.currentTimeMillis());
@@ -120,15 +105,13 @@ public class GBApplication extends Application {
         midNight.set(Calendar.MINUTE, 0);
         midNight.set(Calendar.SECOND, 0);
         midNight.set(Calendar.MILLISECOND, 0);
-       // midNight.setTimeZone(TimeZone.getDefault());
-      //  midNight.set(Calendar.AM_PM, Calendar.AM);
 
         long diff = midNight.getTimeInMillis() -  now.getTimeInMillis();
         int startSeconds = (int) (diff / 1000); // tell the start seconds
         int endSeconds = startSeconds + 300; // within Five minutes
 
-        int startSecondsTest = 60;
-        int endSecondsTest = 120;
+       // int startSecondsTest = 60;
+       // int endSecondsTest = 120;
 
         Job deleteLocalDBJob = firebaseJobDispatcher.newJobBuilder()
                 .setService(DeleteDBJobService.class)

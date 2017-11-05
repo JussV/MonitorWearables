@@ -9,10 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 import smartlife.monitorwearables.GBApplication;
 
-/**
- * Created by Joana on 9/12/2017.
- */
-
 public class ContinuousMeasureScheduler {
     private static ContinuousMeasureScheduler instance;
 
@@ -35,9 +31,7 @@ public class ContinuousMeasureScheduler {
     }
 
     public void init(int interval) {
-     //   monitorInterval = prefs.getInt(TabFragment3.MONITOR_INTERVAL_KEY, 0);
-        int monitorInterval = interval;
-        if (monitorInterval > 0) {
+        if (interval > 0) {
             if(scheduledExecutorThreadPool.getCompletedTaskCount() > 0){
                 end();
             }
@@ -51,7 +45,7 @@ public class ContinuousMeasureScheduler {
                         System.out.println(e.getMessage());
                     }
                 }
-            }, 0, monitorInterval, TimeUnit.SECONDS);
+            }, 0, interval, TimeUnit.SECONDS);
         } else {
             if(future != null) {
                 boolean isCanceled = future.cancel(true);
