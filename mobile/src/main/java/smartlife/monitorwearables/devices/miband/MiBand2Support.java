@@ -82,10 +82,10 @@ public class MiBand2Support extends AbstractBTLEDeviceSupport {
         addSupportedService(GattService.UUID_SERVICE_GENERIC_ACCESS);
         addSupportedService(GattService.UUID_SERVICE_GENERIC_ATTRIBUTE);
         addSupportedService(GattService.UUID_SERVICE_HEART_RATE);
+        addSupportedService(GattService.UUID_SERVICE_PULSE_OXIMETER);
         addSupportedService(GattService.UUID_SERVICE_IMMEDIATE_ALERT);
         addSupportedService(GattService.UUID_SERVICE_DEVICE_INFORMATION);
         addSupportedService(GattService.UUID_SERVICE_ALERT_NOTIFICATION);
-
         addSupportedService(MiBandService.UUID_SERVICE_MIBAND_SERVICE);
         addSupportedService(MiBandService.UUID_SERVICE_MIBAND2_SERVICE);
         addSupportedService(MiBand2Service.UUID_SERVICE_FIRMWARE_SERVICE);
@@ -324,10 +324,10 @@ public class MiBand2Support extends AbstractBTLEDeviceSupport {
         try {
             TransactionBuilder builder = performInitialized("HeartRateTest");
          /*   builder.write(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), stopHeartMeasurementContinuous);
-            builder.write(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), stopHeartMeasurementManual);
-            builder.write(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), startHeartMeasurementManual);*/
+            builder.write(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), stopHeartMeasurementManual);*/
+         //   builder.write(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), startHeartMeasurementContinuous);
             builder.notify(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), true);
-            builder.write(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), new byte[]{ 0x15, 0x2, 1 });
+            builder.write(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), startHeartMeasurementManual);
             builder.queue(getQueue());
         } catch (IOException ex) {
            // LOG.error("Unable to read HearRate with MI2", ex);
@@ -337,15 +337,18 @@ public class MiBand2Support extends AbstractBTLEDeviceSupport {
     @Override
     public void onEnableRealtimeHeartRateMeasurement(boolean enable) {
         try {
-            TransactionBuilder builder = performInitialized("Enable realtime heart rateM measurement");
+            TransactionBuilder builder = performInitialized("Enable realtime heart rate measurement");
             if (enable) {
+                builder.notify(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), true);
                 builder.write(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), stopHeartMeasurementManual);
                 builder.write(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), startHeartMeasurementContinuous);
+               // builder.write(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), new byte[] {0x15, 0x00, 0x01});
+                builder.notify(getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), true);
             } else {
                 builder.write(getCharacteristic(MiBandService.UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT), stopHeartMeasurementContinuous);
             }
             builder.queue(getQueue());
-            enableRealtimeSamplesTimer(enable);
+            //enableRealtimeSamplesTimer(enable);
         } catch (IOException ex) {
          //   LOG.error("Unable to enable realtime heart rate measurement in  MI1S", ex);
         }
@@ -765,7 +768,16 @@ public class MiBand2Support extends AbstractBTLEDeviceSupport {
         return this;
     }
 
+    private MiBand2Support requestBodySensorLocation(TransactionBuilder builder) {
+        // LOG.debug("Requesting Device Info!");
+        BluetoothGattCharacteristic bodySensorLocation = getCharacteristic(GattCharacteristic.UUID_CHARACTERISTIC_BODY_SENSOR_LOCATION);
+        builder.read(bodySensorLocation);
+   //     builder.notify(bodySensorLocation, true);
+        return this;
+    }
+
     public void phase2Initialize(TransactionBuilder builder) {
+        requestBodySensorLocation(builder);
         enableFurtherNotifications(builder, true);
         requestBatteryInfo(builder);
         setTimeFormat(builder);

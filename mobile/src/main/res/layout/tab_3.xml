@@ -48,6 +48,7 @@
             android:layout_below="@id/divider_1"
             android:layout_margin="15dp"
             android:contentDescription="@string/hr_continuous_measurement"
+            android:visibility="gone"
             android:src="@drawable/ic_restore_grey600_24dp"/>
 
         <TextView
@@ -57,6 +58,7 @@
             android:layout_toEndOf="@id/img_monitor_interval"
             android:layout_alignTop="@id/img_monitor_interval"
             android:textSize="@dimen/primary_text"
+            android:visibility="gone"
             android:textColor="@color/primarytext_light"
             android:text="@string/hr_monitor_interval"/>
 
@@ -69,6 +71,7 @@
             android:layout_marginTop="15dp"
             android:dropDownWidth="100dp"
             android:entries="@array/hr_interval_array"
+            android:visibility="gone"
             android:prompt="@string/spinner_monitor_interval_title" />
 
         <TextView
@@ -79,11 +82,41 @@
             android:layout_below="@id/tv_monitor_interval"
             android:textSize="@dimen/secondary_text"
             android:layout_marginBottom="15dp"
+            android:visibility="gone"
             android:text="@string/hr_define_monitor_interval"/>
 
         <View
+            android:id="@+id/divider"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@id/tv_secondary_monitor_interval"
             android:background="@color/divider"/>
+
+        <ImageView
+            android:id="@+id/img_day_night_monitoring_smartband"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/divider"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="120dp"
+            android:adjustViewBounds="true"
+            android:alpha="0.4"
+            android:contentDescription="@string/hr_monitor"
+            android:maxHeight="80dp"
+            android:maxWidth="80dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/day_night_monitoring" />
+        <TextView
+            android:id="@+id/tv_wear_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/img_day_night_monitoring_smartband"
+            android:textSize="@dimen/secondary_text"
+            android:textColor="@color/secondarytext"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="55dp"
+            android:layout_marginEnd="55dp"
+            android:gravity="center"
+            android:text="@string/smartband_info_continuous_measurement"/>
     </RelativeLayout>
