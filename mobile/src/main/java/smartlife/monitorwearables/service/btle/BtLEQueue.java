@@ -43,6 +43,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import smartlife.monitorwearables.GBApplication;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.impl.GBDevice.State;
 /**
@@ -370,27 +371,31 @@ public final class BtLEQueue {
                         gatt.discoverServices();
                     }
                     //cancel auto reconnecting defined in the thread pool
-
-                    if(future != null) {
-                        future.cancel(true);
+                    if(!mGbDevice.isInitialized() && !mGbDevice.isConnected()) {
+                        GBApplication.deviceService().connect(mGbDevice);
                     }
+                   /* if(future != null) {
+                        future.cancel(true);
+                    }*/
                     break;
                 case BluetoothProfile.STATE_DISCONNECTED:
                     handleDisconnected(status);
-                    //try to reconnect to the wearable at 2 minutes intervals
-
+                  /*  //try to reconnect to the wearable at 2 minutes intervals
+                    if(future != null) {
+                        future.cancel(true);
+                    }
                     future = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
                         public void run() {
                             maybeReconnect();
                             // If you need update UI, simply do this:
-                           /* runOnUiThread(new Runnable() {
+                           *//* runOnUiThread(new Runnable() {
                                 public void run() {
                                     // update your UI component here.
                                     myTextView.setText("refreshed");
                                 }
-                            });*/
+                            });*//*
                         }
-                    }, 0, 2, TimeUnit.MINUTES);
+                    }, 0, 2, TimeUnit.MINUTES);*/
                     break;
                 case BluetoothProfile.STATE_CONNECTING:
                     setDeviceConnectionState(State.CONNECTING);

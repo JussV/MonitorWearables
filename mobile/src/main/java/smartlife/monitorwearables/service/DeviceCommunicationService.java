@@ -175,7 +175,7 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
                     // at least send back the current device state
                     mGBDevice.sendDeviceUpdateIntent(this);
                 }
-                return START_REDELIVER_INTENT;
+                return START_STICKY;
             }
         }
 
@@ -379,7 +379,7 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
 
         }
 
-        return START_REDELIVER_INTENT;
+        return START_STICKY;
     }
 
 
