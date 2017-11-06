@@ -113,13 +113,15 @@ public class GBApplication extends Application {
        // int startSecondsTest = 60;
        // int endSecondsTest = 120;
 
+        int frequentStartSeconds = 14400; //4 h converted into seconds
+        int frequentEndSeconds = frequentStartSeconds + 300; //execute job within 5 minutes
+
         Job deleteLocalDBJob = firebaseJobDispatcher.newJobBuilder()
                 .setService(DeleteDBJobService.class)
                 .setTag(DELETE_DB_JOB_TAG)
                 .setLifetime(Lifetime.FOREVER)
                 .setRecurring(true)
-              // .setTrigger(Trigger.executionWindow(periodicity, periodicity + toleranceInterval))
-                .setTrigger(Trigger.executionWindow(startSeconds, endSeconds))
+                .setTrigger(Trigger.executionWindow(frequentStartSeconds, frequentEndSeconds))
                 .setReplaceCurrent(true)
                 .build();
 

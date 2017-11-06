@@ -1,6 +1,7 @@
 package smartlife.monitorwearables.service.jobs;
 
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -34,6 +35,7 @@ public class DeleteDBJobService extends JobService {
          latch = new CountDownLatch(1);
     }
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     public boolean onStartJob(final JobParameters job) {
          mBackgroundTask = new AsyncTask() {
