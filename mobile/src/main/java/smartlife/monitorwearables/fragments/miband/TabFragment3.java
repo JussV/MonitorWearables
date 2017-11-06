@@ -13,6 +13,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import smartlife.monitorwearables.GBApplication;
 import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.service.ContinuousMeasureScheduler;
 
@@ -93,6 +94,7 @@ public class TabFragment3 extends Fragment {
                     toggleView(intervalSpinner, true, 1);
                     toggleView(tvMonitorInterval, true, 1);
                     toggleView(tvSetInterval, true, 1);
+                    GBApplication.deviceService().onEnableRealtimeHeartRateMeasurement(true);
                 } else {
                     sharedPrefs.edit().putBoolean(getString(R.string.key_enable_continuous_monitoring), false).apply();
                     sharedPrefs.edit().putInt(getString(R.string.key_monitor_interval), spinnerFirstPosition).apply();
@@ -100,6 +102,7 @@ public class TabFragment3 extends Fragment {
                     toggleView(tvMonitorInterval, false, 0.3f);
                     toggleView(tvSetInterval, false, 0.7f);
                     intervalSpinner.setSelection(spinnerFirstPosition);
+                    GBApplication.deviceService().onEnableRealtimeHeartRateMeasurement(false);
                     scheduler.end();
                 }
             }
@@ -117,7 +120,7 @@ public class TabFragment3 extends Fragment {
                         sharedPrefs.edit().putInt(getString(R.string.key_monitor_interval), intervalSpinner.getSelectedItemPosition()).apply();
                         synchronized (this) {
                             scheduler.end();
-                            scheduler.init(interval);
+                      //      scheduler.init(interval);
                         }
                     }
                 }
@@ -129,6 +132,7 @@ public class TabFragment3 extends Fragment {
             }
 
         });
+
         return rootView;
     }
 

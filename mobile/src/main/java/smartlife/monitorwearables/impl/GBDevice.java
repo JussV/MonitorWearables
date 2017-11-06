@@ -332,7 +332,6 @@ public class GBDevice implements Parcelable {
         return mRssi;
     }
 
-    // TODO: this doesn't really belong here
     public void sendDeviceUpdateIntent(Context context) {
         Intent deviceUpdateIntent = new Intent(ACTION_DEVICE_CHANGED);
         deviceUpdateIntent.putExtra(EXTRA_DEVICE, this);

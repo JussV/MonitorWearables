@@ -1,6 +1,8 @@
 package smartlife.monitorwearables.service;
 
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -30,7 +32,7 @@ public class ContinuousMeasureScheduler {
         return instance;
     }
 
-    public void init(int interval) {
+ /*   public void init(int interval) {
         if (interval > 0) {
             if(scheduledExecutorThreadPool.getCompletedTaskCount() > 0){
                 end();
@@ -46,6 +48,33 @@ public class ContinuousMeasureScheduler {
                     }
                 }
             }, 0, interval, TimeUnit.SECONDS);
+        } else {
+            if(future != null) {
+                boolean isCanceled = future.cancel(true);
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    // only for Lollipop and newer versions
+                    scheduledExecutorThreadPool.setRemoveOnCancelPolicy(true);
+                }
+            }
+        }
+    }*/
+
+    public void init(boolean isContinousHREnabled) {
+        if (isContinousHREnabled) {
+            if(scheduledExecutorThreadPool.getCompletedTaskCount() > 0){
+                end();
+            }
+            future = scheduledExecutorThreadPool.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        GBApplication.deviceService().onEnableRealtimeHeartRateMeasurement(true);
+                        System.out.println("Thread: " + Thread.currentThread().getId());
+                    } catch (Exception e){
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }, 0, 20, TimeUnit.SECONDS);
         } else {
             if(future != null) {
                 boolean isCanceled = future.cancel(true);

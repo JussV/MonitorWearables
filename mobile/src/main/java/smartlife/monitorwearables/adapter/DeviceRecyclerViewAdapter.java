@@ -119,9 +119,10 @@ public class DeviceRecyclerViewAdapter  extends RecyclerView.Adapter<DeviceRecyc
                 int monitorIntervalPos = prefs.getInt(context.getResources().getString(R.string.key_monitor_interval),0);
                 String monitorIntervalStr = context.getResources().getStringArray(R.array.hr_interval_array)[monitorIntervalPos];
                 int monitorInterval = !monitorIntervalStr.equals("") ? Integer.valueOf(monitorIntervalStr) : 0;
-                if(prefs.getBoolean(context.getResources().getString(R.string.key_enable_continuous_monitoring), false) &&  monitorInterval> 0){
+                boolean isContinousHREnabled = prefs.getBoolean(context.getResources().getString(R.string.key_enable_continuous_monitoring), false);
+                if(isContinousHREnabled){
                   //  context.startService(new Intent(context, ContinuousMeasureService.class));
-                    scheduler.init(monitorInterval);
+                    scheduler.init(isContinousHREnabled);
                 }
             }
             else

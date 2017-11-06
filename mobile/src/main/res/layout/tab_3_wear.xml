@@ -70,8 +70,8 @@
             android:textColor="@color/secondarytext"
             android:layout_centerInParent="true"
             android:layout_marginTop="20dp"
-            android:layout_marginStart="55dp"
-            android:layout_marginEnd="55dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="60dp"
             android:gravity="center"
             android:text="@string/wear_info_continuous_measurement"/>
     </RelativeLayout>

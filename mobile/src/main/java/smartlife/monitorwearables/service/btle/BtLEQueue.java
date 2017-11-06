@@ -26,6 +26,9 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -34,8 +37,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
+import smartlife.monitorwearables.GBApplication;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.impl.GBDevice.State;
 /**
@@ -60,13 +68,13 @@ public final class BtLEQueue {
     private BluetoothGattCharacteristic mWaitCharacteristic;
     private final InternalGattCallback internalGattCallback;
     private boolean mAutoReconnect;
+    private ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(1);
+    private ScheduledFuture future;
 
     private Thread dispatchThread = new Thread("Gadgetbridge GATT Dispatcher") {
 
         @Override
         public void run() {
-           // LOG.debug("Queue Dispatch Thread started.");
-
             while (!mDisposed && !mCrashed) {
                 try {
                     Transaction transaction = mTransactions.take();
@@ -133,7 +141,6 @@ public final class BtLEQueue {
         mGbDevice = gbDevice;
         internalGattCallback = new InternalGattCallback(externalGattCallback);
         mContext = context;
-
         dispatchThread.start();
     }
 
@@ -338,7 +345,6 @@ public final class BtLEQueue {
 
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-         //   LOG.debug("connection state change, newState: " + newState + getStatusString(status));
 
             synchronized (mGattMonitor) {
                 if (mBluetoothGatt == null) {
@@ -356,24 +362,42 @@ public final class BtLEQueue {
 
             switch (newState) {
                 case BluetoothProfile.STATE_CONNECTED:
-               //     LOG.info("Connected to GATT server.");
                     setDeviceConnectionState(State.CONNECTED);
                     // Attempts to discover services after successful connection.
                     List<BluetoothGattService> cachedServices = gatt.getServices();
                     if (cachedServices != null && cachedServices.size() > 0) {
-                 //       LOG.info("Using cached services, skipping discovery");
                         onServicesDiscovered(gatt, BluetoothGatt.GATT_SUCCESS);
                     } else {
-                //        LOG.info("Attempting to start service discovery:" +
-                                gatt.discoverServices();
+                        gatt.discoverServices();
                     }
+                    //cancel auto reconnecting defined in the thread pool
+                    if(!mGbDevice.isInitialized() && !mGbDevice.isConnected()) {
+                        GBApplication.deviceService().connect(mGbDevice);
+                    }
+                   /* if(future != null) {
+                        future.cancel(true);
+                    }*/
                     break;
                 case BluetoothProfile.STATE_DISCONNECTED:
-                 //   LOG.info("Disconnected from GATT server.");
                     handleDisconnected(status);
+                  /*  //try to reconnect to the wearable at 2 minutes intervals
+                    if(future != null) {
+                        future.cancel(true);
+                    }
+                    future = scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
+                        public void run() {
+                            maybeReconnect();
+                            // If you need update UI, simply do this:
+                           *//* runOnUiThread(new Runnable() {
+                                public void run() {
+                                    // update your UI component here.
+                                    myTextView.setText("refreshed");
+                                }
+                            });*//*
+                        }
+                    }, 0, 2, TimeUnit.MINUTES);*/
                     break;
                 case BluetoothProfile.STATE_CONNECTING:
-                //    LOG.info("Connecting to GATT server...");
                     setDeviceConnectionState(State.CONNECTING);
                     break;
             }
@@ -390,8 +414,6 @@ public final class BtLEQueue {
                     // only propagate the successful event
                     getCallbackToUse().onServicesDiscovered(gatt);
                 }
-            } else {
-         //       LOG.warn("onServicesDiscovered received: " + status);
             }
         }
 
@@ -408,10 +430,7 @@ public final class BtLEQueue {
         }
 
         @Override
-        public void onCharacteristicRead(BluetoothGatt gatt,
-                                         BluetoothGattCharacteristic characteristic,
-                                         int status) {
-          //  LOG.debug("characteristic read: " + characteristic.getUuid() + getStatusString(status));
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             if (!checkCorrectGattInstance(gatt, "characteristic read")) {
                 return;
             }
@@ -419,7 +438,7 @@ public final class BtLEQueue {
                 try {
                     getCallbackToUse().onCharacteristicRead(gatt, characteristic, status);
                 } catch (Throwable ex) {
-             //       LOG.error("onCharacteristicRead: " + ex.getMessage(), ex);
+                    Log.e("error:", ex.getMessage());
                 }
             }
             checkWaitingCharacteristic(characteristic, status);
@@ -476,7 +495,6 @@ public final class BtLEQueue {
                     getCallbackToUse().onCharacteristicChanged(gatt, characteristic);
                 } catch (Throwable ex) {
                     Log.e("ERROR: ", ex.getMessage());
-           //         LOG.error("onCharaceristicChanged: " + ex.getMessage(), ex);
                 }
             } else {
            //     LOG.info("No gattcallback registered, ignoring characteristic change");

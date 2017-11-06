@@ -28,6 +28,7 @@ public class MiBand2Service {
     public static final UUID UUID_SERVICE_MIBAND_SERVICE = UUID.fromString(String.format(BASE_UUID, "FEE0"));
     public static final UUID UUID_SERVICE_MIBAND2_SERVICE = UUID.fromString(String.format(BASE_UUID, "FEE1"));
     public static final UUID UUID_SERVICE_HEART_RATE = UUID.fromString(String.format(BASE_UUID, "180D"));
+    public static final UUID UUID_SERVICE_PULSE_OXIMETER_SERVICE =  UUID.fromString(String.format(BASE_UUID, "1822"));
     public static final UUID UUID_SERVICE_FIRMWARE_SERVICE = UUID.fromString("00001530-0000-3512-2118-0009af100700");
 
     public static final UUID UUID_CHARACTERISTIC_FIRMWARE = UUID.fromString("00001531-0000-3512-2118-0009af100700");
@@ -132,6 +133,7 @@ public class MiBand2Service {
         MIBAND_DEBUG = new HashMap<>();
         MIBAND_DEBUG.put(UUID_SERVICE_MIBAND_SERVICE, "MiBand Service");
         MIBAND_DEBUG.put(UUID_SERVICE_HEART_RATE, "MiBand HR Service");
+        MIBAND_DEBUG.put(UUID_SERVICE_PULSE_OXIMETER_SERVICE, "Mi Band Pulse Service");
     }
 
 }

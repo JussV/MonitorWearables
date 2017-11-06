@@ -20,6 +20,7 @@ package smartlife.monitorwearables.service;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -31,6 +32,7 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -135,7 +137,6 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
         super.onCreate();
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter(GBDevice.ACTION_DEVICE_CHANGED));
         mFactory = getDeviceSupportFactory();
-
         if (hasPrefs()) {
             getPrefs().getPreferences().registerOnSharedPreferenceChangeListener(this);
         }
@@ -152,7 +153,6 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
     public synchronized int onStartCommand(Intent intent, int flags, int startId) {
 
         if (intent == null) {
-         //   LOG.info("no intent");
             return START_NOT_STICKY;
         }
 
@@ -160,14 +160,12 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
         boolean firstTime = intent.getBooleanExtra(EXTRA_CONNECT_FIRST_TIME, false);
 
         if (action == null) {
-         //   LOG.info("no action");
             return START_NOT_STICKY;
         }
 
         if (!action.equals(ACTION_START) && !action.equals(ACTION_CONNECT)) {
             if (!mStarted) {
                 // using the service before issuing ACTION_START
-          //      LOG.info("Must start service with " + ACTION_START + " or " + ACTION_CONNECT + " before using it: " + action);
                 return START_NOT_STICKY;
             }
 
@@ -384,6 +382,7 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
         return START_STICKY;
     }
 
+
     /**
      * Disposes the current DeviceSupport instance (if any) and sets a new device support instance
      * (if not null)
@@ -402,6 +401,7 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
         if (!mStarted) {
             startForeground(GB.NOTIFICATION_ID, GB.createNotification(getString(R.string.wearablehrmonitor_running), false, this));
             mStarted = true;
+            Log.d("6", "start");
         }
     }
 
