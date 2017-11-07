@@ -84,7 +84,8 @@ public class TabFragment3 extends Fragment {
                     toggleView(intervalSpinner, true, 1);
                     toggleView(tvMonitorInterval, true, 1);
                     toggleView(tvSetInterval, true, 1);
-                    GBApplication.deviceService().onEnableRealtimeHeartRateMeasurement(true);
+                //   GBApplication.deviceService().onEnableRealtimeHeartRateMeasurement(true);
+                    scheduler.init(true);
                 } else {
                     sharedPrefs.edit().putBoolean(getString(R.string.key_enable_continuous_monitoring), false).apply();
                     sharedPrefs.edit().putInt(getString(R.string.key_monitor_interval), spinnerFirstPosition).apply();
@@ -92,8 +93,8 @@ public class TabFragment3 extends Fragment {
                     toggleView(tvMonitorInterval, false, 0.3f);
                     toggleView(tvSetInterval, false, 0.7f);
                     intervalSpinner.setSelection(spinnerFirstPosition);
-                    GBApplication.deviceService().onEnableRealtimeHeartRateMeasurement(false);
-                    scheduler.end();
+                //    GBApplication.deviceService().onEnableRealtimeHeartRateMeasurement(false);
+                    scheduler.init(false);
                 }
             }
         });
