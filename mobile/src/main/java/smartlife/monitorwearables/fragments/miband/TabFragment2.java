@@ -11,26 +11,24 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.Locale;
+
+import pl.droidsonroids.gif.GifTextView;
 import smartlife.monitorwearables.GBApplication;
 import smartlife.monitorwearables.R;
-import smartlife.monitorwearables.db.HRMonitorDbHelper;
 import smartlife.monitorwearables.service.HeartRateService;
-import pl.droidsonroids.gif.GifTextView;
 public class TabFragment2 extends Fragment {
 
     private Button measureHR;
     private TextView tvLiveHR;
-    private long liveHR;
     private GifTextView gifHR;
-    private HRMonitorDbHelper mDbHelper;
     private static SharedPreferences sharedPrefs;
     public static final String IS_HR_LIVE_TAB_ACTIVE = "isHRLiveTabActive";
 
     public TabFragment2(){}
 
     public static Fragment newInstance() {
-        TabFragment2 myFragment = new TabFragment2();
-        return myFragment;
+        return new TabFragment2();
     }
 
     @Override
@@ -38,13 +36,12 @@ public class TabFragment2 extends Fragment {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         sharedPrefs.registerOnSharedPreferenceChangeListener(prefListener);
         View rootView = inflater.inflate(R.layout.tab_2, container, false);
-        mDbHelper = new HRMonitorDbHelper(getContext());
-        tvLiveHR = (TextView) rootView.findViewById(R.id.tv_live_hr);
-        measureHR = (Button) rootView.findViewById(R.id.btn_measure_hr);
-        gifHR = (GifTextView) rootView.findViewById(R.id.gif_hr);
+        tvLiveHR = rootView.findViewById(R.id.tv_live_hr);
+        measureHR = rootView.findViewById(R.id.btn_measure_hr);
+        gifHR = rootView.findViewById(R.id.gif_hr);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-
+        setButtonClickability();
         measureHR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +57,7 @@ public class TabFragment2 extends Fragment {
             }
         });
         if(getArguments() != null){
-            liveHR = getArguments().getLong(HeartRateService.EXTRA_LIVE_HR);
+            long liveHR = getArguments().getLong(HeartRateService.EXTRA_LIVE_HR);
             if(liveHR > 0){
                 gifHR.setVisibility(View.GONE);
                 params.addRule(RelativeLayout.BELOW, tvLiveHR.getId());
@@ -68,7 +65,7 @@ public class TabFragment2 extends Fragment {
                 measureHR.setLayoutParams(params);
                 tvLiveHR.setVisibility(View.VISIBLE);
                 tvLiveHR.setAlpha(0.7f);
-                tvLiveHR.setText(Long.toString(liveHR));
+                tvLiveHR.setText(String.format(Locale.getDefault(), "%d", liveHR));
             }
         }
 
@@ -78,16 +75,20 @@ public class TabFragment2 extends Fragment {
     SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
             if (key.equals(getString(R.string.key_enable_continuous_monitoring))) {
-                boolean isContinuousHREnabled = sharedPrefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false);
-                if(isContinuousHREnabled){
-                    measureHR.setEnabled(false);
-                    measureHR.setClickable(false);
-                } else {
-                    measureHR.setEnabled(true);
-                    measureHR.setClickable(true);
-                }
+               setButtonClickability();
             }
         }
     };
+
+    private void setButtonClickability(){
+        boolean isContinuousHREnabled = sharedPrefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false);
+        if(isContinuousHREnabled){
+            measureHR.setEnabled(false);
+            measureHR.setClickable(false);
+        } else {
+            measureHR.setEnabled(true);
+            measureHR.setClickable(true);
+        }
+    }
 
 }
