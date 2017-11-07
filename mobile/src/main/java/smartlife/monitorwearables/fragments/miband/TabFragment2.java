@@ -84,7 +84,7 @@ public class TabFragment2 extends Fragment {
         boolean isContinuousHREnabled = sharedPrefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false);
         if(isContinuousHREnabled){
             measureHR.setClickable(false);
-            measureHR.setVisibility(View.INVISIBLE);
+            measureHR.setVisibility(View.GONE);
         } else {
             measureHR.setClickable(true);
             measureHR.setVisibility(View.VISIBLE);

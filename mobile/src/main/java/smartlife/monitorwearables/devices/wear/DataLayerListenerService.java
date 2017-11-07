@@ -63,6 +63,10 @@ public class DataLayerListenerService extends WearableListenerService {
             Log.v(LOG_TAG, "Message path received on watch is: " + messageEvent.getPath());
             Log.v(LOG_TAG, "Message received on watch is: " + heartRate);
             HRMonitorLocalDBOperations.insertHeartRate(this, heartRate, deviceKey);
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction(CollectionDemoActivity.ACTION_BROADCAST_HR_WEAR);
+            broadcastIntent.putExtra(EXTRA_LIVE_HR_WEAR, heartRate);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
         }
         else {
             super.onMessageReceived(messageEvent);

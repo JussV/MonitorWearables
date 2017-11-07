@@ -18,34 +18,22 @@ import smartlife.monitorwearables.GBApplication;
 import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.service.ContinuousMeasureScheduler;
 
-
-/**
- * Created by Joana on 8/15/2017.
- */
 public class TabFragment3 extends Fragment {
-/*
-    public static final String ENABLE_CONTINUOUS_MONITORING_KEY = "enableContinuousMonitoring";
-    public static final String MONITOR_INTERVAL_KEY = "monitorInterval";*/
 
     private Spinner intervalSpinner;
     private TextView tvMonitorInterval;
     private TextView tvSetInterval;
-    private Switch hrMonitorSwitch;
     private static SharedPreferences sharedPrefs;
     private int spinnerFirstPosition = 0;
     private boolean isSpinnerInitial = true;
     private ContinuousMeasureScheduler scheduler;
-    /*private SettingsManager mSettingsManager;
-    private WearSettingsManager mWearSettingsManager;
-    private GoogleApiClient mGoogleApiClient;*/
 
     public TabFragment3(){
         scheduler = ContinuousMeasureScheduler.getInstance();
     }
 
     public static Fragment newInstance() {
-        TabFragment3 myFragment = new TabFragment3();
-        return myFragment;
+        return new TabFragment3();
     }
 
 
@@ -66,15 +54,15 @@ public class TabFragment3 extends Fragment {
             toggleView(intervalSpinner, false, 0.5f);
             intervalSpinner.setSelected(false);
         }
-        hrMonitorSwitch = (Switch) rootView.findViewById(R.id.switch_heartrate_monitor);
+        Switch hrMonitorSwitch = rootView.findViewById(R.id.switch_heartrate_monitor);
         boolean isHRMonitorEnabled = sharedPrefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false);
         if(isHRMonitorEnabled) {
             isSpinnerInitial = true;
         }
         hrMonitorSwitch.setChecked(isHRMonitorEnabled);
 
-        tvMonitorInterval = (TextView) rootView.findViewById(R.id.tv_monitor_interval);
-        tvSetInterval = (TextView) rootView.findViewById(R.id.tv_secondary_monitor_interval);
+        tvMonitorInterval = rootView.findViewById(R.id.tv_monitor_interval);
+        tvSetInterval = rootView.findViewById(R.id.tv_secondary_monitor_interval);
 
         if(hrMonitorSwitch.isChecked()){
             toggleView(tvMonitorInterval, true, 1);
