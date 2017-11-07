@@ -74,7 +74,7 @@ public class TabFragment2 extends Fragment {
 
     SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-            if (key.equals(getString(R.string.key_enable_continuous_monitoring))) {
+            if (key.equals(getString(R.string.key_enable_continuous_monitoring)) && getActivity().getClass().getName()!= null) {
                setButtonClickability();
             }
         }
@@ -83,11 +83,11 @@ public class TabFragment2 extends Fragment {
     private void setButtonClickability(){
         boolean isContinuousHREnabled = sharedPrefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false);
         if(isContinuousHREnabled){
-            measureHR.setEnabled(false);
             measureHR.setClickable(false);
+            measureHR.setVisibility(View.INVISIBLE);
         } else {
-            measureHR.setEnabled(true);
             measureHR.setClickable(true);
+            measureHR.setVisibility(View.VISIBLE);
         }
     }
 
