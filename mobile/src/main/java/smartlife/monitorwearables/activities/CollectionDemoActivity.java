@@ -143,6 +143,7 @@ public class CollectionDemoActivity extends GBActivity {
             }
         });
 
+
         syncHR = findViewById(R.id.iv_sync_hr);
         syncHR.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -281,7 +282,6 @@ public class CollectionDemoActivity extends GBActivity {
                         .attach(fragment1)
                         .commit();
             }
-
 
         }
     };

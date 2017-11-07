@@ -13,12 +13,12 @@
         android:layout_centerHorizontal="true"
         android:textSize="60sp"
         android:textAlignment="textEnd"
-        android:paddingLeft="68dp"
+        android:paddingStart="30dp"
+        android:paddingEnd="70dp"
         android:paddingTop="30dp"
         android:textColor="@color/bg_live_hr"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="40dp"
+        tools:text="123"/>
 
     <pl.droidsonroids.gif.GifTextView
         android:id="@+id/gif_hr"

@@ -10,10 +10,6 @@ import smartlife.monitorwearables.fragments.miband.TabFragment1;
 import smartlife.monitorwearables.fragments.miband.TabFragment2;
 import smartlife.monitorwearables.fragments.miband.TabFragment3;
 
-/**
- * Created by Joana on 8/15/2017.
- */
-
 public class DemoCollectionPagerAdapter extends FragmentStatePagerAdapter {
     int numberOfTabs;
     List<Fragment> registeredFragments;
@@ -62,4 +58,5 @@ public class DemoCollectionPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getRegisteredFragment(int position) {
         return registeredFragments.get(position);
     }
+
 }

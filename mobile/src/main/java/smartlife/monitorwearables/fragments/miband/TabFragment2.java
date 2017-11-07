@@ -16,11 +16,6 @@ import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.db.HRMonitorDbHelper;
 import smartlife.monitorwearables.service.HeartRateService;
 import pl.droidsonroids.gif.GifTextView;
-
-/**
- * Created by Joana on 8/15/2017.
- */
-
 public class TabFragment2 extends Fragment {
 
     private Button measureHR;
@@ -41,7 +36,7 @@ public class TabFragment2 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-
+        sharedPrefs.registerOnSharedPreferenceChangeListener(prefListener);
         View rootView = inflater.inflate(R.layout.tab_2, container, false);
         mDbHelper = new HRMonitorDbHelper(getContext());
         tvLiveHR = (TextView) rootView.findViewById(R.id.tv_live_hr);
@@ -76,6 +71,23 @@ public class TabFragment2 extends Fragment {
                 tvLiveHR.setText(Long.toString(liveHR));
             }
         }
+
         return rootView;
     }
+
+    SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+            if (key.equals(getString(R.string.key_enable_continuous_monitoring))) {
+                boolean isContinuousHREnabled = sharedPrefs.getBoolean(getString(R.string.key_enable_continuous_monitoring), false);
+                if(isContinuousHREnabled){
+                    measureHR.setEnabled(false);
+                    measureHR.setClickable(false);
+                } else {
+                    measureHR.setEnabled(true);
+                    measureHR.setClickable(true);
+                }
+            }
+        }
+    };
+
 }

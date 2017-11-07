@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,6 +80,7 @@ public class TabFragment3 extends Fragment {
             toggleView(tvMonitorInterval, true, 1);
             toggleView(tvSetInterval, true, 1);
             toggleView(intervalSpinner, true, 1);
+
         } else {
             toggleView(tvMonitorInterval, false, 0.3f);
             toggleView(tvSetInterval, false, 0.7f);
