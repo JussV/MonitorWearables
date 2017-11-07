@@ -140,11 +140,10 @@ public class HeartbeatService extends Service implements SensorEventListener {
     }
 
     private void sendMessageToHandheld(final String message) {
-        if (mGoogleApiClient == null)
+       if (mGoogleApiClient == null)
             return;
-
         // use the api client to send the heartbeat value to the handheld
-        final PendingResult<NodeApi.GetConnectedNodesResult> nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient);
+        /*final PendingResult<NodeApi.GetConnectedNodesResult> nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient);
         nodes.setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
             public void onResult(@NonNull NodeApi.GetConnectedNodesResult result) {
@@ -165,7 +164,30 @@ public class HeartbeatService extends Service implements SensorEventListener {
                     Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, dm.toByteArray());
                 }
             }
-        });
+        });*/
+
+        if(mGoogleApiClient.isConnected()) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+                    final String path = "/wear/heartRate";
+                    for (Node node : nodes.getNodes()) {
+                        Log.d(TAG_HEART_BEAT, "Send message to handheld: " + message);
+                        ArrayList<DataMap> messagesToHandheld = new ArrayList<>();
+                        DataMap hrMessage = new DataMap();
+                        hrMessage.putString("heartRate", message);
+                        messagesToHandheld.add(hrMessage);
+                        DataMap wearModel = new DataMap();
+                        wearModel.putString("wearModel", Build.MODEL);
+                        messagesToHandheld.add(wearModel);
+                        DataMap dm = new DataMap();
+                        dm.putDataMapArrayList("key", messagesToHandheld);
+                        Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, dm.toByteArray());
+                    }
+                }
+            }).start();
+        }
     }
 
     @Override

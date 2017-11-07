@@ -58,7 +58,7 @@ public class TabFragment1 extends Fragment {
         } else {
             selectionArgs = null;
         }
-                RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv_heart_rates);
+        RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv_heart_rates);
         HRMonitorDbHelper mDbHelper = new HRMonitorDbHelper(getContext());
         heartRateArray = new ArrayList<HeartRate>();
         SQLiteDatabase db = mDbHelper.getReadableDatabase();

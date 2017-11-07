@@ -4,10 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -37,6 +35,7 @@ import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.adapter.DemoCollectionPagerAdapter;
 import smartlife.monitorwearables.db.HRMonitorContract;
 import smartlife.monitorwearables.db.HRMonitorLocalDBOperations;
+import smartlife.monitorwearables.devices.wear.DataLayerListenerService;
 import smartlife.monitorwearables.entities.Device;
 import smartlife.monitorwearables.entities.HeartRate;
 import smartlife.monitorwearables.fragments.miband.TabFragment1;
@@ -55,26 +54,24 @@ public class CollectionDemoActivity extends GBActivity {
 
     private ViewPager viewPager;
     private List<Fragment> fragments = new Vector<Fragment>();
-    private static SharedPreferences sharedPrefs;
-    private ImageView syncHR;
     private CoordinatorLayout coordinatorLayout;
 
     public final static String ACTION_BROADCAST_HR = "smartlife.monitorwearables.broadcasthr";
+    public final static String ACTION_BROADCAST_HR_WEAR = "smartlife.monitorwearables.broadcasthr.wear";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         Intent intent = getIntent();
         final Integer deviceType = (Integer)intent.getExtras().get(Constants.DEVICE_TYPE);
 
         this.setTitle("Heart rate");
         setContentView(R.layout.activity_collection_demo);
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_layout);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        coordinatorLayout = findViewById(R.id.main_layout);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
 
         tabLayout.addTab(tabLayout.newTab());
         tabLayout.addTab(tabLayout.newTab());
@@ -88,7 +85,11 @@ public class CollectionDemoActivity extends GBActivity {
         tabLayout.getTabAt(TAB_LIST_HR).setCustomView(firstTab);
 
         TextView secondTab = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        secondTab.setText("  ".concat(getResources().getString(R.string.measure_hr)).toUpperCase());
+        if(deviceType == DeviceType.ANDROIDWEAR_MOTO360SPORT.getKey()){
+            secondTab.setText("  ".concat(getResources().getString(R.string.live_hr)).toUpperCase());
+        } else {
+            secondTab.setText("  ".concat(getResources().getString(R.string.measure_hr)).toUpperCase());
+        }
         secondTab.setTextColor(getResources().getColor(R.color.primarytext_dark));
         secondTab.setTypeface(null, Typeface.BOLD);
         secondTab.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pulse, 0, 0, 0);
@@ -143,7 +144,8 @@ public class CollectionDemoActivity extends GBActivity {
             }
         });
 
-        syncHR = findViewById(R.id.iv_sync_hr);
+
+        ImageView syncHR = findViewById(R.id.iv_sync_hr);
         syncHR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -238,8 +240,10 @@ public class CollectionDemoActivity extends GBActivity {
     @Override
     protected void onResume() {
         // Register to receive messages.
-        // We are registering an observer (mMessageReceiver) to receive Intents
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter(ACTION_BROADCAST_HR));
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_BROADCAST_HR);
+        filter.addAction(ACTION_BROADCAST_HR_WEAR);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
         super.onResume();
     }
 
@@ -258,28 +262,61 @@ public class CollectionDemoActivity extends GBActivity {
             Fragment currentFragment = getCurrentFragment();
             FragmentTransaction fragmentTransaction =  getSupportFragmentManager().beginTransaction();
 
-            if(currentFragment instanceof TabFragment1){
-                TabFragment1 fragment1 = (TabFragment1) ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(TAB_LIST_HR);
-                fragmentTransaction
-                        .detach(currentFragment)
-                        .attach(fragment1)
-                        .commit();
-            } else if (currentFragment instanceof TabFragment2){
-                Bundle bundle = new Bundle();
-                bundle.putLong(HeartRateService.EXTRA_LIVE_HR, intent.getLongExtra(HeartRateService.EXTRA_LIVE_HR, -1));
-                TabFragment2 fragment2 = (TabFragment2) ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(TAB_LIVE_HR);
-                if (fragment2.getArguments() == null) {
-                    fragment2.setArguments(bundle);
-                } else {
-                    fragment2.getArguments().putAll(bundle);
-                }
-                TabFragment1 fragment1 = (TabFragment1) ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(TAB_LIST_HR);
-                fragmentTransaction
-                        .detach(currentFragment)
-                        .attach(fragment2)
-                        .detach(fragments.get(TAB_LIST_HR))
-                        .attach(fragment1)
-                        .commit();
+            switch(intent.getAction()){
+                case ACTION_BROADCAST_HR:
+                    if(currentFragment instanceof TabFragment1){
+                        TabFragment1 fragment1 = (TabFragment1) ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(TAB_LIST_HR);
+                        fragmentTransaction
+                                .detach(currentFragment)
+                                .attach(fragment1)
+                                .commit();
+                    } else if (currentFragment instanceof TabFragment2){
+                        Bundle bundle = new Bundle();
+                        bundle.putLong(HeartRateService.EXTRA_LIVE_HR, intent.getLongExtra(HeartRateService.EXTRA_LIVE_HR, -1));
+                        TabFragment2 fragment2 = (TabFragment2) ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(TAB_LIVE_HR);
+                        if (fragment2.getArguments() == null) {
+                            fragment2.setArguments(bundle);
+                        } else {
+                            fragment2.getArguments().putAll(bundle);
+                        }
+                        TabFragment1 fragment1 = (TabFragment1) ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(TAB_LIST_HR);
+                        fragmentTransaction
+                                .detach(currentFragment)
+                                .attach(fragment2)
+                                .detach(fragments.get(TAB_LIST_HR))
+                                .attach(fragment1)
+                                .commit();
+                    }
+
+                    break;
+                case ACTION_BROADCAST_HR_WEAR:
+                    if(currentFragment instanceof smartlife.monitorwearables.fragments.wear.TabFragment1) {
+                        smartlife.monitorwearables.fragments.wear.TabFragment1 fragment1 = (smartlife.monitorwearables.fragments.wear.TabFragment1)
+                                ((DemoCollectionPagerAdapter) viewPager.getAdapter()).getRegisteredFragment(TAB_LIST_HR);
+                        fragmentTransaction
+                                .detach(currentFragment)
+                                .attach(fragment1)
+                                .commit();
+                    } else if (currentFragment instanceof smartlife.monitorwearables.fragments.wear.TabFragment2){
+                        Bundle bundle = new Bundle();
+                        bundle.putLong(DataLayerListenerService.EXTRA_LIVE_HR_WEAR, intent.getIntExtra(DataLayerListenerService.EXTRA_LIVE_HR_WEAR, -1));
+                        smartlife.monitorwearables.fragments.wear.TabFragment2 fragment2 = (smartlife.monitorwearables.fragments.wear.TabFragment2)
+                                ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(TAB_LIVE_HR);
+                        if (fragment2.getArguments() == null) {
+                            fragment2.setArguments(bundle);
+                        } else {
+                            fragment2.getArguments().putAll(bundle);
+                        }
+                        smartlife.monitorwearables.fragments.wear.TabFragment1 fragment1 =
+                                (smartlife.monitorwearables.fragments.wear.TabFragment1) ((DemoCollectionPagerAdapter)viewPager.getAdapter()).getRegisteredFragment(TAB_LIST_HR);
+                        fragmentTransaction
+                                .detach(currentFragment)
+                                .attach(fragment2)
+                                .detach(fragments.get(TAB_LIST_HR))
+                                .attach(fragment1)
+                                .commit();
+                    }
+                    break;
             }
 
 

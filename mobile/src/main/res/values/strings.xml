@@ -82,6 +82,7 @@
     <string name="collection_demo_activity">Collection Demo Activity</string>
     <string name="measure_hr">Measure HR</string>
     <string name="daily_hr">Daily HR</string>
+    <string name="live_hr">Live HR</string>
     <string name="miband_prefs_hr_sleep_detection">HR sleep detection</string>
     <string name="hr_monitor">Heart Rate Monitor</string>
     <string name="hr_continuous_measurement">Continuous measurement</string>

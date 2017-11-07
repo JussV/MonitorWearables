@@ -1,15 +1,19 @@
 package smartlife.monitorwearables.service;
 
+import android.app.Activity;
 import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 
 import smartlife.monitorwearables.activities.CollectionDemoActivity;
 import smartlife.monitorwearables.db.HRMonitorContract;
 import smartlife.monitorwearables.db.HRMonitorDbHelper;
+import smartlife.monitorwearables.db.HRMonitorLocalDBOperations;
+import smartlife.monitorwearables.fragments.wear.TabFragment1;
 
 public class HeartRateService extends IntentService {
 
@@ -36,18 +40,7 @@ public class HeartRateService extends IntentService {
     public void measureHeartRate(Intent intent) {
         long heartRate = intent.getLongExtra(EXTRA_LIVE_HR, -1);
         int deviceTypeKey = intent.getIntExtra(DEVICE_TYPE_KEY, -1);
-        // Gets the data repository in write mode
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        // Create a new map of values, where column names are the keys
-        ContentValues values = new ContentValues();
-        values.put(HRMonitorContract.HeartRate.COLUMN_VALUE, heartRate);
-        //Gives the number of milliseconds since January 1, 1970 00:00:00 UTC
-        values.put(HRMonitorContract.HeartRate.COLUMN_CREATED_AT, System.currentTimeMillis());
-        values.put(HRMonitorContract.HeartRate.COLUMN_DEVICE_TYPE_KEY, deviceTypeKey);
-        // Insert the new row, returning the primary key value of the new row
-        long newRowId = db.insert(HRMonitorContract.HeartRate.TABLE_NAME, null, values);
-        db.close();
+        HRMonitorLocalDBOperations.insertHeartRate(this, heartRate, deviceTypeKey);
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(CollectionDemoActivity.ACTION_BROADCAST_HR);
         broadcastIntent.putExtra(EXTRA_LIVE_HR, heartRate);
@@ -62,4 +55,5 @@ public class HeartRateService extends IntentService {
         intent.putExtra(DEVICE_TYPE_KEY, deviceTypeKey);
         context.startService(intent);
     }
+
 }
