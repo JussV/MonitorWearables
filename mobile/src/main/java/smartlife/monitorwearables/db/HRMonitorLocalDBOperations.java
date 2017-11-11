@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import smartlife.monitorwearables.entities.HeartRate;
+import smartlife.monitorwearables.entities.User;
 
 public class HRMonitorLocalDBOperations {
     private static HRMonitorDbHelper mDbHelper;
@@ -93,6 +94,47 @@ public class HRMonitorLocalDBOperations {
         long newRowId = db.insert(HRMonitorContract.HeartRate.TABLE_NAME, null, values);
         db.close();
         return newRowId;
+    }
+
+    public static long insertUser(Context ctx, User user){
+        mDbHelper = new HRMonitorDbHelper(ctx);
+        db = mDbHelper.getWritableDatabase();
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(HRMonitorContract.User.COLUMN_EMAIl, user.getEmail());
+        //Gives the number of milliseconds since January 1, 1970 00:00:00 UTC
+        values.put(HRMonitorContract.User.COLUMN_CREATED_AT, System.currentTimeMillis());
+        values.put(HRMonitorContract.User.COLUMN_UNIQUE_PHONE_ID, user.getUniquePhoneId());
+        values.put(HRMonitorContract.User.COLUMN_USERNAME, user.getUsername());
+        // Insert the new row, returning the primary key value of the new row
+        long newRowId = db.insert(HRMonitorContract.User.TABLE_NAME, null, values);
+        db.close();
+        return newRowId;
+    }
+
+    public static User getUser(Context ctx, String[] projection, String selection, String[] selectionArgs,  String groupBy, String having, String sortOrder ){
+        mDbHelper = new HRMonitorDbHelper(ctx);
+        db = mDbHelper.getReadableDatabase();
+        User user = null;
+        Cursor cursor = db.query(
+                HRMonitorContract.User.TABLE_NAME,         // The table to query
+                projection,                                     // The columns to return
+                selection,                                      // The columns for the WHERE clause
+                selectionArgs,                                  // The values for the WHERE clause
+                groupBy,                                        // don't group the rows
+                having,                                         // don't filter by row groups
+                sortOrder                                       // The sort order
+        );
+
+        if(cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            user = new User(cursor.getString(cursor.getColumnIndexOrThrow(HRMonitorContract.User.COLUMN_USERNAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(HRMonitorContract.User.COLUMN_EMAIl)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(HRMonitorContract.User.COLUMN_UNIQUE_PHONE_ID)));
+        }
+        cursor.close();
+        db.close();
+        return user;
     }
 
 

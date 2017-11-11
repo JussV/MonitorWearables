@@ -22,4 +22,12 @@ public class HRMonitorContract {
         public static final String COLUMN_DEVICE_TYPE_KEY = "deviceKey";
     }
 
+    public static class User implements BaseColumns {
+        public static final String TABLE_NAME = "user";
+        public static final String COLUMN_CREATED_AT = "createdAt";
+        public static final String COLUMN_USERNAME = "username";
+        public static final String COLUMN_EMAIl = "email";
+        public static final String COLUMN_UNIQUE_PHONE_ID = "uniquePhoneId";
+    }
+
 }

@@ -74,7 +74,7 @@ public class TabFragment2 extends Fragment {
 
     SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-            if (key.equals(getString(R.string.key_enable_continuous_monitoring)) && getActivity().getClass().getName()!= null) {
+            if (getActivity().getClass().getName()!= null && key.equals(getString(R.string.key_enable_continuous_monitoring))) {
                setButtonClickability();
             }
         }

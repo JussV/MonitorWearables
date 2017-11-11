@@ -2,9 +2,6 @@ package smartlife.monitorwearables.entities;
 
 import java.util.Date;
 
-/**
- * Created by Joana on 9/25/2017.
- */
 
 public class HeartRate {
 
