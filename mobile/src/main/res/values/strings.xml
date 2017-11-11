@@ -74,6 +74,7 @@
     <string name="title_activity_discovery">Device Discovery</string>
     <string name="title_activity_mi_band_pairing">Pair your Mi Band</string>
     <string name="title_activity_signup">Sign Up</string>
+    <string name="title_activity_signup_completed">Sign Up Completed</string>
     <string name="no_items_bg">No available devices.</string>
     <string name="delete_device">Delete %1$s</string>
     <string name="delete_device_message">All data related to the device will be deleted.</string>
@@ -102,6 +103,11 @@
     <string name="signup_for_cloud_app">Sign Up for cloud app\n
         <a href="https://unlock-your-wearable.herokuapp.com"><b>unlock-your-wearable.herokuapp.com</b></a>\n
         to view reports and statistics for your heart rate measurements.
+    </string>
+    <string name="signup_for_cloud_app_completed">You have successfully Signed Up to \n
+        <a href="https://unlock-your-wearable.herokuapp.com"><b>unlock-your-wearable.herokuapp.com</b></a>.\n\n
+        Please visit this link to see detailed reports and statistics of your hear rate measurements. It is highly recommend to use the app on laptop instead mobile device.\n\n
+        You can also manage user credentials (username, password etc.) on the above web app.
     </string>
     <string name="username">Username</string>
     <string name="password">Password</string>

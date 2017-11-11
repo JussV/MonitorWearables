@@ -68,8 +68,12 @@ import java.util.Set;
 import smartlife.monitorwearables.GBApplication;
 import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.adapter.DeviceRecyclerViewAdapter;
+import smartlife.monitorwearables.db.HRMonitorContract;
+import smartlife.monitorwearables.db.HRMonitorLocalDBOperations;
 import smartlife.monitorwearables.devices.DeviceManager;
 import smartlife.monitorwearables.devices.wear.DataLayerListenerService;
+import smartlife.monitorwearables.entities.Device;
+import smartlife.monitorwearables.entities.User;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.model.DeviceType;
 import smartlife.monitorwearables.service.volley.VolleyOperations;
@@ -93,6 +97,15 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
     Set<Node> nodeList = null;
     private WifiManager wifiManager;
     WifiInfo wifiInfo;
+
+    String[] projection = {
+            HRMonitorContract.User.COLUMN_EMAIl,
+            HRMonitorContract.User.COLUMN_USERNAME,
+            HRMonitorContract.User.COLUMN_UNIQUE_PHONE_ID
+    };
+
+    String selection = HRMonitorContract.User.COLUMN_UNIQUE_PHONE_ID  + "=?";
+
 
     private Handler handler = new Handler() {
         @Override
@@ -184,7 +197,8 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-
+                            Intent signUpIntent = new Intent(getApplicationContext(), SignUpActivity.class);
+                            startActivity(signUpIntent);
                         }
                     }).setNegativeButton(R.string.cancel, null).show();
 
@@ -255,8 +269,16 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
                 startActivity(debugIntent);
                 return true;*/
             case R.id.action_signup:
-                Intent signUpIntent = new Intent(this, SignUpActivity.class);
-                startActivity(signUpIntent);
+                final String uniquePhoneId = Device.getDeviceUniqueId(getApplicationContext());
+                User user = HRMonitorLocalDBOperations.getUser(this, projection, selection, new String[]{ uniquePhoneId }, null, null, null);
+                if(user == null){
+                    Intent signUpIntent = new Intent(this, SignUpActivity.class);
+                    startActivity(signUpIntent);
+                } else {
+                    Intent signUpCompletedIntent = new Intent(this, SignUpCompletedActivity.class);
+                    startActivity(signUpCompletedIntent);
+                }
+
                 return true;
         }
 
