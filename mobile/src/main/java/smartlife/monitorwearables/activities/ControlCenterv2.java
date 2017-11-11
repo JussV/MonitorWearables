@@ -255,8 +255,8 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
                 startActivity(debugIntent);
                 return true;*/
             case R.id.action_signup:
-                /*Intent debugIntent = new Intent(this, DebugActivity.class);
-                startActivity(debugIntent);*/
+                Intent signUpIntent = new Intent(this, SignUpActivity.class);
+                startActivity(signUpIntent);
                 return true;
         }
 

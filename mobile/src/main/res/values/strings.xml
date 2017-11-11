@@ -73,6 +73,7 @@
 
     <string name="title_activity_discovery">Device Discovery</string>
     <string name="title_activity_mi_band_pairing">Pair your Mi Band</string>
+    <string name="title_activity_signup">Sign Up</string>
     <string name="no_items_bg">No available devices.</string>
     <string name="delete_device">Delete %1$s</string>
     <string name="delete_device_message">All data related to the device will be deleted.</string>
@@ -97,12 +98,17 @@
     <string name="key_enable_continuous_monitoring">enableContinuousMonitoring</string>
     <string name="key_enable_wear_continuous_monitoring">enableWearContinuousMonitoring</string>
     <string name="signup_title">SignUp</string>
-    <string name="signup_for_cloud_app">Please Sign Up for cloud app unlock-your-wearable.herokuapp.com to view reports and statistics for your heart rate measurements.</string>
+    <string name="signup">Sign Up</string>
+    <string name="signup_for_cloud_app">Sign Up for cloud app\n
+        <a href="https://unlock-your-wearable.herokuapp.com"><b>unlock-your-wearable.herokuapp.com</b></a>\n
+        to view reports and statistics for your heart rate measurements.
+    </string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="user">User Account</string>
     <string name="ok">OK</string>
     <string name="nav_bg">Nav backgound</string>
+    <string name="email">Email</string>
 
     <string-array name="hr_interval_array">
         <item> </item>

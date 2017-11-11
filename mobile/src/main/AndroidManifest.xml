@@ -70,7 +70,11 @@
         </activity>
         <activity android:name=".activities.GBActivity"
             android:theme="@style/GadgetbridgeTheme.NoActionBar" />
-
+        <activity
+            android:name=".activities.SignUpActivity"
+            android:parentActivityName=".activities.ControlCenterv2"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_signup" />
         <service android:name=".service.DeviceCommunicationService" />
         <service android:name=".service.HeartRateService" />
         <service
