@@ -21,6 +21,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -39,6 +40,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
@@ -47,6 +49,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -77,7 +80,6 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
 
     private String TAG = "ControlCenterv2";
 
-    //needed for KK compatibility
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
@@ -175,8 +177,19 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
         Prefs prefs = GBApplication.getPrefs();
         if (prefs.getBoolean("firstrun", true)) {
             prefs.getPreferences().edit().putBoolean("firstrun", false).apply();
-            Intent enableIntent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
-            startActivity(enableIntent);
+            //show alert dialog to remind the user to signup to cloud app
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.signup_title)
+                    .setMessage(R.string.signup_for_cloud_app)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).setNegativeButton(R.string.cancel, null).show();
+
+          /*  Intent enableIntent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+            startActivity(enableIntent);*/
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkAndRequestPermissions();
@@ -237,9 +250,13 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
         drawer.closeDrawer(GravityCompat.START);
 
         switch (item.getItemId()) {
-            case R.id.action_debug:
+            /*case R.id.action_debug:
                 Intent debugIntent = new Intent(this, DebugActivity.class);
                 startActivity(debugIntent);
+                return true;*/
+            case R.id.action_signup:
+                /*Intent debugIntent = new Intent(this, DebugActivity.class);
+                startActivity(debugIntent);*/
                 return true;
         }
 

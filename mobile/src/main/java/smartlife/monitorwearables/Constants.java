@@ -6,6 +6,7 @@ public class Constants {
     public static final String URL ="https://unlock-your-wearable.herokuapp.com";
     public static final String DEVICE_API ="/api/devices";
     public static final String HEART_RATE_API ="/api/heartrates";
+    public static final String USER_API = "/api/users";
     public static final String DEVICE_KEY ="key";
     public static final String DEVICE_NAME ="name";
     public static final String LATEST_SYNC_DATE = "/sync/latest";

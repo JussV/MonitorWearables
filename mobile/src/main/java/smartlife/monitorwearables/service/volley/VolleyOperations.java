@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import smartlife.monitorwearables.Constants;
+import smartlife.monitorwearables.entities.User;
 import smartlife.monitorwearables.impl.GBDevice;
 
 
@@ -176,4 +177,8 @@ public class VolleyOperations {
                 });
         VolleySingleton.getInstance(context).addToRequestQueue(jsArrRequest);
     }
+
+   /* public static User createUser(){
+
+    }*/
 }

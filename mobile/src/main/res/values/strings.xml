@@ -96,6 +96,13 @@
     <string name="key_monitor_interval">monitorInterval</string>
     <string name="key_enable_continuous_monitoring">enableContinuousMonitoring</string>
     <string name="key_enable_wear_continuous_monitoring">enableWearContinuousMonitoring</string>
+    <string name="signup_title">SignUp</string>
+    <string name="signup_for_cloud_app">Please Sign Up for cloud app unlock-your-wearable.herokuapp.com to view reports and statistics for your heart rate measurements.</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="user">User Account</string>
+    <string name="ok">OK</string>
+    <string name="nav_bg">Nav backgound</string>
 
     <string-array name="hr_interval_array">
         <item> </item>
