@@ -83,7 +83,7 @@ public class DeleteDBJobService extends JobService {
 
                                     @Override
                                     public void onFailure(){
-
+                                        int i=0;
                                     }
                                 });
                             }

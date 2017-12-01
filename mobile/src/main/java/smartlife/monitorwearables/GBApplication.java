@@ -110,10 +110,10 @@ public class GBApplication extends Application {
         int startSeconds = (int) (diff / 1000); // tell the start seconds
         int endSeconds = startSeconds + 300; // within Five minutes
 
-       // int startSecondsTest = 60;
-       // int endSecondsTest = 120;
+        //int startSecondsTest = 60;
+        //int endSecondsTest = 120;
 
-        int frequentStartSeconds = 14400; //4 h converted into seconds
+        int frequentStartSeconds = 1800; //4 h converted into seconds
         int frequentEndSeconds = frequentStartSeconds + 300; //execute job within 5 minutes
 
         Job deleteLocalDBJob = firebaseJobDispatcher.newJobBuilder()
