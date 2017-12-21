@@ -21,6 +21,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -39,6 +40,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
@@ -47,6 +49,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -65,8 +68,12 @@ import java.util.Set;
 import smartlife.monitorwearables.GBApplication;
 import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.adapter.DeviceRecyclerViewAdapter;
+import smartlife.monitorwearables.db.HRMonitorContract;
+import smartlife.monitorwearables.db.HRMonitorLocalDBOperations;
 import smartlife.monitorwearables.devices.DeviceManager;
 import smartlife.monitorwearables.devices.wear.DataLayerListenerService;
+import smartlife.monitorwearables.entities.Device;
+import smartlife.monitorwearables.entities.User;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.model.DeviceType;
 import smartlife.monitorwearables.service.volley.VolleyOperations;
@@ -77,7 +84,6 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
 
     private String TAG = "ControlCenterv2";
 
-    //needed for KK compatibility
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
@@ -91,6 +97,15 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
     Set<Node> nodeList = null;
     private WifiManager wifiManager;
     WifiInfo wifiInfo;
+
+    String[] projection = {
+            HRMonitorContract.User.COLUMN_EMAIl,
+            HRMonitorContract.User.COLUMN_USERNAME,
+            HRMonitorContract.User.COLUMN_UNIQUE_PHONE_ID
+    };
+
+    String selection = HRMonitorContract.User.COLUMN_UNIQUE_PHONE_ID  + "=?";
+
 
     private Handler handler = new Handler() {
         @Override
@@ -175,8 +190,20 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
         Prefs prefs = GBApplication.getPrefs();
         if (prefs.getBoolean("firstrun", true)) {
             prefs.getPreferences().edit().putBoolean("firstrun", false).apply();
-            Intent enableIntent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
-            startActivity(enableIntent);
+            //show alert dialog to remind the user to signup to cloud app
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.signup_title)
+                    .setMessage(R.string.signup_for_cloud_app)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent signUpIntent = new Intent(getApplicationContext(), SignUpActivity.class);
+                            startActivity(signUpIntent);
+                        }
+                    }).setNegativeButton(R.string.cancel, null).show();
+
+          /*  Intent enableIntent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+            startActivity(enableIntent);*/
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkAndRequestPermissions();
@@ -237,9 +264,21 @@ public class ControlCenterv2 extends AppCompatActivity implements CapabilityApi.
         drawer.closeDrawer(GravityCompat.START);
 
         switch (item.getItemId()) {
-            case R.id.action_debug:
+            /*case R.id.action_debug:
                 Intent debugIntent = new Intent(this, DebugActivity.class);
                 startActivity(debugIntent);
+                return true;*/
+            case R.id.action_signup:
+                final String uniquePhoneId = Device.getDeviceUniqueId(getApplicationContext());
+                User user = HRMonitorLocalDBOperations.getUser(this, projection, selection, new String[]{ uniquePhoneId }, null, null, null);
+                if(user == null){
+                    Intent signUpIntent = new Intent(this, SignUpActivity.class);
+                    startActivity(signUpIntent);
+                } else {
+                    Intent signUpCompletedIntent = new Intent(this, SignUpCompletedActivity.class);
+                    startActivity(signUpCompletedIntent);
+                }
+
                 return true;
         }
 

@@ -6,4 +6,5 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="primary_text">16sp</dimen>
     <dimen name="secondary_text">14sp</dimen>
+    <dimen name="activity_signup">25dp</dimen>
 </resources>

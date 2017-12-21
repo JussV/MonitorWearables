@@ -70,6 +70,8 @@ public class CollectionDemoActivity extends GBActivity {
         coordinatorLayout = findViewById(R.id.main_layout);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         TabLayout tabLayout = findViewById(R.id.tab_layout);
 

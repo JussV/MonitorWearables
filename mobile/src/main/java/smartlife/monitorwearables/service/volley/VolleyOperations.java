@@ -1,6 +1,7 @@
 package smartlife.monitorwearables.service.volley;
 
 import android.content.Context;
+import android.content.Intent;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -24,6 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import smartlife.monitorwearables.Constants;
+import smartlife.monitorwearables.activities.SignUpActivity;
+import smartlife.monitorwearables.activities.SignUpCompletedActivity;
+import smartlife.monitorwearables.db.HRMonitorLocalDBOperations;
+import smartlife.monitorwearables.entities.User;
 import smartlife.monitorwearables.impl.GBDevice;
 
 
@@ -175,5 +180,47 @@ public class VolleyOperations {
                     }
                 });
         VolleySingleton.getInstance(context).addToRequestQueue(jsArrRequest);
+    }
+
+    public static void createUser(final JSONObject userObj, final Context context){
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.POST, Constants.URL.concat(Constants.USER_API), userObj, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        //user has been successfully added to remote db
+                        //create user in local db
+                        try {
+                            final User user = new User(userObj.getString("name"), userObj.getString("password"), userObj.getString("email"), userObj.getString("uniquePhoneId"));
+                            long newRowId = HRMonitorLocalDBOperations.insertUser(context, user);
+                            if(newRowId > 0){
+                                Intent signUpCompletedIntent = new Intent(context, SignUpCompletedActivity.class);
+                                signUpCompletedIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                context.startActivity(signUpCompletedIntent);
+                            }
+                        } catch (org.json.JSONException ex){
+                            ex.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        String errorMsg = getErrorMessage(error);
+                        if(errorMsg != null){
+                            Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show();
+                        }
+                        if(!error.networkResponse.notModified){
+                            Toast.makeText(context, "User was not created. Probably the email address already exists in the cloud app.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+        int socketTimeout = 30000; // 30 seconds.
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        jsObjRequest.setRetryPolicy(policy);
+        VolleySingleton.getInstance(context).addToRequestQueue(jsObjRequest);
     }
 }

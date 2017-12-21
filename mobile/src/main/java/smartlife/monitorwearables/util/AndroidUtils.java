@@ -16,10 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package smartlife.monitorwearables.util;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.ParcelUuid;
 import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -27,7 +25,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
