@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-package smartlife.monitorwearables.devices.wear;
+package smartlife.monitorwearables.devices.wear.moto;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

@@ -28,7 +28,6 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
     private TextView mTextView;
     public static ServiceConnection sc;
     private int mChinSize;
-    private static SharedPreferences prefs;
     public static Activity self;
     private Intent intent;
 
@@ -36,8 +35,6 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         self = this;
-
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.wear_activity_main);
 
         ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BODY_SENSORS}, 1);
@@ -107,8 +104,8 @@ public class WearActivity extends WearableActivity implements HeartbeatService.O
         super.onExitAmbient();
     }
 
-    public void toggleServiceRunning() {
-        if(prefs.getBoolean(self.getResources().getString(R.string.key_enable_wear_continuous_monitoring), false)){
+    public void toggleServiceRunning(SettingsManager mSettingsManager) {
+        if(mSettingsManager.getBoolean(self.getResources().getString(R.string.key_enable_wear_continuous_monitoring), false)){
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

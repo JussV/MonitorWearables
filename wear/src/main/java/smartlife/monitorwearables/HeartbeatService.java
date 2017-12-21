@@ -39,7 +39,6 @@ public class HeartbeatService extends Service implements SensorEventListener {
     private GoogleApiClient mGoogleApiClient;
     private PowerManager.WakeLock wakeLock;
     Handler handler;
-    SharedPreferences prefs;
     String[] monitorIntervals;
     private Sensor mHeartRateSensor;
     private SettingsManager mSettingsManager;
@@ -71,7 +70,6 @@ public class HeartbeatService extends Service implements SensorEventListener {
         super.onCreate();
         handler = new Handler();
         mSettingsManager = new SettingsManager(this);
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         monitorIntervals = getResources().getStringArray(R.array.hr_interval_array);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
@@ -79,7 +77,6 @@ public class HeartbeatService extends Service implements SensorEventListener {
         int fifoSize = mHeartRateSensor.getFifoReservedEventCount();
         int fifoMax = mHeartRateSensor.getFifoMaxEventCount();
         // delay SENSOR_DELAY_UI is sufficient
-       // if(prefs.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring), false)){
         if(mSettingsManager.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring), false)){
             boolean res = mSensorManager.registerListener(this, mHeartRateSensor,  600000000);
             Log.d(TAG_HEART_BEAT, " sensor registered: " + (res ? "yes" : "no"));
@@ -116,7 +113,7 @@ public class HeartbeatService extends Service implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if(!prefs.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring), false)){
+        if(!mSettingsManager.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring), false)){
             unregisterListener();
         } else {
             // is this a heartbeat event and does it have data?
@@ -143,29 +140,6 @@ public class HeartbeatService extends Service implements SensorEventListener {
        if (mGoogleApiClient == null)
             return;
         // use the api client to send the heartbeat value to the handheld
-        /*final PendingResult<NodeApi.GetConnectedNodesResult> nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient);
-        nodes.setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
-            @Override
-            public void onResult(@NonNull NodeApi.GetConnectedNodesResult result) {
-                final List<Node> nodes = result.getNodes();
-                final String path = "/wear/heartRate";
-
-                for (Node node : nodes) {
-                    Log.d(TAG_HEART_BEAT, "Send message to handheld: " + message);
-                    ArrayList<DataMap> messagesToHandheld = new ArrayList<>();
-                    DataMap hrMessage = new DataMap();
-                    hrMessage.putString("heartRate", message);
-                    messagesToHandheld.add(hrMessage);
-                    DataMap wearModel = new DataMap();
-                    wearModel.putString("wearModel", Build.MODEL);
-                    messagesToHandheld.add(wearModel);
-                    DataMap dm = new DataMap();
-                    dm.putDataMapArrayList("key", messagesToHandheld);
-                    Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), path, dm.toByteArray());
-                }
-            }
-        });*/
-
         if(mGoogleApiClient.isConnected()) {
             new Thread(new Runnable() {
                 @Override

@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.felkertech.settingsmanager.SettingsManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -29,6 +30,7 @@ public class DataLayerListenerService extends WearableListenerService {
     private SharedPreferences prefs;
     private Node nearbyNode;
     WearActivity wearActivity = new WearActivity();
+    private SettingsManager mSettingsManager;
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
@@ -37,7 +39,7 @@ public class DataLayerListenerService extends WearableListenerService {
         }
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
+        mSettingsManager = new SettingsManager(this);
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .build();
@@ -67,8 +69,9 @@ public class DataLayerListenerService extends WearableListenerService {
                 }
                 DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
                 if (nodeId.equals(nearbyNode.getId())) {
-                    prefs.edit().putBoolean(getString(R.string.key_enable_wear_continuous_monitoring), dataMap.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring))).apply();
-                    wearActivity.toggleServiceRunning();
+                //    prefs.edit().putBoolean(getString(R.string.key_enable_wear_continuous_monitoring), dataMap.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring))).apply();
+                    mSettingsManager.setBoolean(getString(R.string.key_enable_wear_continuous_monitoring), dataMap.getBoolean(getString(R.string.key_enable_wear_continuous_monitoring)));
+                    wearActivity.toggleServiceRunning(mSettingsManager);
                 }
             }
 

@@ -22,14 +22,8 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.Wearable;
-
-import org.w3c.dom.Node;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,7 +33,7 @@ import smartlife.monitorwearables.R;
 import smartlife.monitorwearables.devices.miband.MiBand2Coordinator;
 import smartlife.monitorwearables.devices.miband.MiBandConst;
 import smartlife.monitorwearables.devices.miband.MiBandCoordinator;
-import smartlife.monitorwearables.devices.wear.AndroidWearCoordinator;
+import smartlife.monitorwearables.devices.wear.moto.AndroidWearCoordinator;
 import smartlife.monitorwearables.impl.GBDevice;
 import smartlife.monitorwearables.impl.GBDeviceCandidate;
 import smartlife.monitorwearables.model.DeviceType;
