@@ -53,7 +53,7 @@
     <string name="discovery_start_scanning">Start Discovery</string>
 
     <string name="device_with_rssi">%1$s (%2$s)</string>
-    <string name="discovery_connected_devices_hint">Make your device discoverable. Currently connected devices will likely not be discovered. Activate location (e.g. GPS) on Android 6+. If no device is found after a few minutes, try again after rebooting your mobile device.</string>
+    <string name="discovery_connected_devices_hint">It is possible for currently connected devices not to be discovered. Activate location (e.g. GPS) on Android 6+. If no device is found after a few minutes, try again after rebooting your mobile device.</string>
     <string name="discovery_note">Note:</string>
 
     <string name="test_notification">Test Notification</string>
