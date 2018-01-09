@@ -23,8 +23,12 @@ public class ValidatorUtils {
     }
 
     public static boolean isEmpty(EditText editText) {
-        String input = editText.getText().toString().trim();
-        return input.length() == 0;
+        if(editText != null && editText.getText()!= null){
+            String input = editText.getText().toString().trim();
+            return input.length() == 0;
+        }
+        return true;
     }
+
 
 }

@@ -77,7 +77,7 @@ public class CollectionDemoActivity extends GBActivity {
 
         tabLayout.addTab(tabLayout.newTab());
         tabLayout.addTab(tabLayout.newTab());
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_settings_light));
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_settings_light).setContentDescription("Settings"));
 
         TextView firstTab = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         firstTab.setText("  ".concat(getResources().getString(R.string.daily_hr)).toUpperCase());

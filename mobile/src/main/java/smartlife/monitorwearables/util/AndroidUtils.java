@@ -69,13 +69,6 @@ public class AndroidUtils {
         }
     }
 
-
-    public static String getDateTime() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        Date date = new Date();
-        return dateFormat.format(date);
-    }
-
     public static long parseMongoDateToLocal(String date){
         try {
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -87,13 +80,6 @@ public class AndroidUtils {
             e.printStackTrace();
         }
        return 0;
-    }
-
-    public static Date localDateToUTC(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date gmt = new Date(sdf.format(date));
-        return gmt;
     }
 
 }

@@ -115,6 +115,12 @@
     <string name="ok">OK</string>
     <string name="nav_bg">Nav backgound</string>
     <string name="email">Email</string>
+    <string name="invalid_email">Invalid Email</string>
+    <string name="required_email">Email is required</string>
+    <string name="required_password">Password is required</string>
+    <string name="required_username">Username is required</string>
+    <string name="user_is_not_created">User was not created. Probably the email address already exists in the cloud app.</string>
+    <string name="short_pass">Password should be at least 8 characters long</string>
 
     <string-array name="hr_interval_array">
         <item> </item>

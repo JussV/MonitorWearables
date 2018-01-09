@@ -23,4 +23,6 @@ public class ExampleInstrumentedTest {
 
         assertEquals("smartlife.monitorwearables", appContext.getPackageName());
     }
+
+
 }
