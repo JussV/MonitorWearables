@@ -47,23 +47,23 @@ public class SignUpActivity extends AppCompatActivity {
                     GB.toast("Internet connection is required to sign up to the cloud app.",  Toast.LENGTH_LONG, GB.ERROR);
                 } else {
                     if (ValidatorUtils.isEmpty(email)) {
-                        email.setError("Email is required");
+                        email.setError(getResources().getString(R.string.required_email));
                     } else {
                         if (!ValidatorUtils.isValidEmail(emailTxt)) {
-                            email.setError("Invalid Email");
+                            email.setError(getResources().getString(R.string.invalid_email));
                         }
                     }
 
                     if (ValidatorUtils.isEmpty(password)) {
-                        password.setError("Password is required");
+                        password.setError(getResources().getString(R.string.required_password));
                     } else {
                         if (!ValidatorUtils.isValidPassword(passTxt)) {
-                            password.setError("Password should be at least 8 characters long.");
+                            password.setError(getResources().getString(R.string.short_pass));
                         }
                     }
 
                     if (ValidatorUtils.isEmpty(username)) {
-                        username.setError("Username is required");
+                        username.setError(getResources().getString(R.string.required_username));
                     }
 
                     if(email.getError() == null && password.getError() == null && username.getError() == null){
